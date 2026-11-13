@@ -163,13 +163,21 @@ Configure an LLM provider key in AOM to get generated answers. Without one, AOM 
 
 | Port | Service |
 |---|---|
-| `8084` | **The app in a browser**, inside a phone frame (`?frame=0` for full width), and the story at `/story` |
+| `5156` | **The app in a browser** over HTTPS, behind the sign-in page, inside a phone frame (`?frame=0` for full width), and the story at `/story` |
 | `8204` | Backend API + MCP server (`/ins/mcp`); `/` lists every link |
 | `4990` | Sync Gateway public, which is what phones replicate with: `ws://<host>:4990/insurance` |
 | `127.0.0.1:4991` | Sync Gateway admin |
 | `127.0.0.1:18094` | Couchbase Web Console (Administrator / password123) |
 
-The ports are chosen so this stack runs alongside AOM and the OneChat demo (8083 / 8202 / 4988).
+**Sign-in and HTTPS.** The browser UI (the app, the story page and everything else the `web` container serves) is on **`https://<host>:5156`** and opens on a sign-in page:
+
+| Username | Password |
+|---|---|
+| `demo` | `Couchbase123!` |
+
+Change them with `DEMO_USERNAME` / `DEMO_PASSWORD` in `.env` (Compose) or `web.auth.username` / `web.auth.password` (Helm). The container serves a self-signed certificate it generates on first start, so the browser warns once; add the address people use to `TLS_HOSTS` (Compose) so it is in the certificate, or serve a real one by mounting `tls.crt` / `tls.key` at `/etc/nginx/tls` (Helm: `web.tls.secretName`). Plain `http://` on the same port redirects to HTTPS, and `/signout` ends the session. The sign-in covers the browser UI only: the backend API and Sync Gateway ports are unchanged.
+
+The ports are chosen so this stack runs alongside AOM and the OneChat demo (5150 / 8202 / 4988).
 
 ### 3. The app on a device with Couchbase Lite
 

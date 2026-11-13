@@ -5,9 +5,19 @@
 FROM nginx:1.27.3-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 ADD dist.tgz /usr/share/nginx/html/
-# The story that opens the demo: http://<host>:8084/story
+# The story that opens the demo: https://<host>:5156/story
 COPY story.html /usr/share/nginx/html/story.html
 # Files checked out or built on a workstation can carry 0600 modes; nginx's
 # worker runs as `nginx` and would answer 403. Normalize everything it serves.
 RUN chmod -R a+rX /usr/share/nginx/html
-EXPOSE 80
+# HTTPS and the sign-in page in front of everything above (see nginx.conf):
+# demo-gate.sh runs before nginx starts, creates a self-signed certificate if
+# none is mounted at /etc/nginx/tls, and derives the sign-in check from
+# DEMO_USERNAME / DEMO_PASSWORD.
+RUN command -v openssl >/dev/null || apk add --no-cache openssl
+COPY signin.html /usr/share/nginx/html/signin.html
+COPY demo-gate.sh /docker-entrypoint.d/15-demo-gate.sh
+RUN chmod 644 /usr/share/nginx/html/signin.html && chmod 755 /docker-entrypoint.d/15-demo-gate.sh
+ENV DEMO_USERNAME=demo \
+    DEMO_PASSWORD=Couchbase123!
+EXPOSE 443
