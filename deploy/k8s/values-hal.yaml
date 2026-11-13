@@ -1,0 +1,26 @@
+# insurance-app on "hal" (single-node K3s) at 192.168.111.5.
+# Secrets (the AOM admin password) are NOT kept here - deploy.sh writes them to
+# a mode-600 values file on the node instead.
+publicHost: "192.168.111.5"
+# No LoadBalancer implementation on the node: publish on its IP directly.
+externalIPs: ["192.168.111.5"]
+
+aom:
+  enabled: true
+  # The AOM behind the public IP (the NOV procurement demo's). Its dashboard
+  # proxies the API, so the backend talks to the dashboard URL. It is outside
+  # this cluster, so it reaches this demo's MCP server through the backend
+  # port published on hal's IP.
+  url: https://45.52.200.223:3111
+  mcpPublicUrl: http://192.168.111.5:8204/ins/mcp
+  # Linked from the story page.
+  dashboardUrl: https://45.52.200.223:3111
+
+# Same ports as on mother, so the scripts' defaults (--backend <host>:8204) and the
+# README hold on either node: 8084 the app, 8204 the backend API, 4990 Sync Gateway.
+web:
+  service: { type: LoadBalancer, port: 8084 }
+backend:
+  service: { type: LoadBalancer, port: 8204 }
+syncGateway:
+  service: { type: LoadBalancer, port: 4990 }

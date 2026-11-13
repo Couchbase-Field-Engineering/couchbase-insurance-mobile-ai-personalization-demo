@@ -1,0 +1,13 @@
+apiVersion: v2
+name: insurance-app
+description: >-
+  Couchbase insurance mobile demo (Harborline) on Kubernetes: Couchbase Server
+  (policyholder, member and on-demand customer profiles from the nightly export), Sync
+  Gateway (Couchbase Lite replication for phones), the backend (FastAPI + the
+  insurance-services MCP server, which registers itself with the Couchbase Agent
+  Operations Manager), the app in a browser, and a daily CronJob that drops a
+  new mock export.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords: [couchbase, couchbase-lite, sync-gateway, mcp, rag, chatbot, personalization]

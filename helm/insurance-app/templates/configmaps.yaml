@@ -1,0 +1,36 @@
+# Copies of couchbase-init/init.sh, sync-gateway/db-config.json and
+# datagen/generate_mock_export.py (deploy/k8s/deploy.sh refreshes chart/files/
+# from the repository before every install).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: insurance-app-scripts
+  labels: {{- include "insurance.labels" . | nindent 4 }}
+data:
+  init.sh: |-
+{{ .Files.Get "files/init.sh" | indent 4 }}
+  db-config.json: |-
+{{ .Files.Get "files/db-config.json" | indent 4 }}
+  generate_mock_export.py: |-
+{{ .Files.Get "files/generate_mock_export.py" | indent 4 }}
+  export.sh: |-
+    #!/bin/sh
+    # Stands in for the nightly export from the systems of record: writes today's
+    # exportTime= partition if it isn't there yet, then keeps only the newest
+    # partitions. Run on first start (init container) and daily (CronJob).
+    set -eu
+    OUT=/data/insurance-export
+    TODAY=$(TZ="${EXPORT_TZ:-UTC}" date +%Y-%m-%d)
+    STAMP=$(TZ="${EXPORT_TZ:-UTC}" date +%Y%m%d)
+    mkdir -p "$OUT"
+    if [ -f "$OUT/exportTime=$STAMP/_SUCCESS" ] && [ "${FORCE:-0}" != "1" ]; then
+      echo "Partition exportTime=$STAMP already exported"
+    else
+      echo "Exporting exportTime=$STAMP ({{ .Values.nightlyExport.targetMb }} MiB) ..."
+      cd /srv && PYTHONPATH=/srv python /scripts/generate_mock_export.py --export-date "$TODAY" \
+        --target-mb {{ .Values.nightlyExport.targetMb }} --parts {{ .Values.nightlyExport.parts }} --out "$OUT"
+    fi
+    ls -d "$OUT"/exportTime=* | sort | head -n -{{ .Values.nightlyExport.keepPartitions }} | while read -r old; do
+      echo "Removing $old"; rm -rf "$old"
+    done
+    ls -la "$OUT"

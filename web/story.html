@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Couchbase Harborline · One chatbot for the whole company</title>
+<meta name="description" content="How Couchbase and the Agent Operations Manager run one chatbot for customers, prospects and employees - grounded, governed, offline-capable and without a model call per question. The story that opens the Couchbase Harborline demo.">
+<style>
+:root{--bg:#f7f7f7;--panel:#fff;--panel2:#fff0da;--line:#d2d5d9;--fg:#000;--fg2:#333;--muted:#5c5c5c;--navy:#000;--head:#000;--gold:#ec1218;--gold2:#b30005;--ocean:#fc9d0c;--aqua:#fff0da;--cb:#ec1218;--cb2:#b30005;--green:#0b7a2b;--amber:#a65f00;--shadow:0 0 32px rgba(0,0,0,.08);--display:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+html[data-theme=dark]{--bg:#000;--panel:#141414;--panel2:#1f1f1f;--line:#333;--fg:#fff;--fg2:#d2d5d9;--muted:#9b9382;--head:#fff;--gold2:#ff5a5e;--cb2:#ff5a5e;--green:#21ea2a;--amber:#fc9d0c;--shadow:0 0 32px rgba(0,0,0,.5)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:16px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{display:flex;flex-direction:column}
+a{color:var(--cb2)}
+.bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:14px;padding:10px 22px;background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--fg);letter-spacing:-.01em;white-space:nowrap}
+.brand svg{height:24px;width:auto;display:block}html[data-theme=dark] .brand svg .wm{fill:#fff}.brand small{color:var(--muted);font-weight:500;font-size:13px;margin-left:4px}
+.dots{display:flex;gap:7px;margin:0 auto}.dots button{width:9px;height:9px;border-radius:50%;border:0;background:var(--line);padding:0;cursor:pointer;transition:background .2s,transform .2s}
+.dots button.on{background:var(--gold);transform:scale(1.3)}.dots button:hover{background:var(--muted)}
+.pill{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel2);color:var(--fg2);white-space:nowrap}
+.pill.ok{color:var(--green);border-color:rgba(19,128,75,.3);background:rgba(19,128,75,.08)}.pill.bad{color:var(--cb2);border-color:rgba(234,35,40,.3)}.pill.warn{color:var(--amber);border-color:rgba(178,98,0,.3);background:rgba(178,98,0,.08)}
+.btn{font:inherit;font-size:14px;font-weight:600;padding:10px 16px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:#fff}.btn:hover{filter:brightness(.97)}.btn.sm{padding:6px 12px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:default}
+main{flex:1;scroll-snap-type:y proximity}
+section.ch{min-height:calc(100vh - 53px);display:flex;align-items:center;scroll-snap-align:start;padding:56px 22px}
+.wrap{width:min(1180px,100%);margin:0 auto}
+.kicker{color:var(--gold2);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
+h1{font-family:var(--display);font-size:clamp(36px,5.2vw,66px);line-height:1.04;letter-spacing:-.01em;margin:0 0 20px;font-weight:600;letter-spacing:-.03em;color:var(--head)}
+h2{font-family:var(--display);font-size:clamp(28px,3.4vw,42px);line-height:1.1;letter-spacing:-.01em;margin:0 0 10px;font-weight:600;letter-spacing:-.02em;color:var(--head)}
+.accent{color:var(--gold)}.cbc{color:var(--cb2)}
+.lede{font-size:clamp(17px,1.4vw,20px);color:var(--fg2);max-width:780px;margin:0 0 26px}
+.src{color:var(--muted);font-size:12.5px;margin-top:16px}
+.grid{display:grid;gap:14px}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--shadow);min-width:0;border-color:transparent}
+.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:rgba(236,18,24,.12);color:var(--gold2);font-weight:800;font-size:13px;margin-bottom:10px}
+.card h3{margin:0 0 6px;font-size:16px;letter-spacing:-.01em}.card p{margin:0;color:var(--fg2);font-size:14px}
+.card ul{margin:8px 0 0;padding-left:18px;color:var(--fg2);font-size:13.5px}.card li{margin:3px 0}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:var(--panel2);color:var(--muted);margin-top:10px}
+.tag.cb{background:rgba(234,35,40,.08);color:var(--cb2)}
+.icon{font-size:22px;line-height:1;margin-bottom:8px;display:block}
+.hero{background:#000;color:#fff}.hero h1{color:#fff}.hero .lede{color:rgba(255,255,255,.82)}.hero .kicker{color:#fff}.hero .btn:not(.primary){background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}.hero .disclaimer{color:rgba(255,255,255,.5)}.hero .cbc{color:#ff5a5e}.alt{background:#fff0da}html[data-theme=dark] .alt{background:#141414}
+.scenario{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;margin-top:18px}
+.quote{background:#000;color:#fff;border-radius:18px;padding:22px 24px;box-shadow:var(--shadow)}
+.quote .who{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#fc9d0c;font-weight:700;margin-bottom:8px}
+.quote p{margin:0;font-size:17px;line-height:1.55;color:rgba(255,255,255,.92)}.quote b{color:#fff}
+/* diagram */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:14px 16px}
+.diagram .head{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-size:14px;color:var(--fg2)}.diagram .head .btn{margin-left:auto}
+.diagram svg{width:100%;height:auto;display:block}
+.sb{fill:var(--panel2);stroke:var(--line)}.st{fill:var(--fg);font-size:12.5px;font-weight:700}.ss{fill:var(--muted);font-size:10.5px}
+.sbad{stroke:#9aa3b8;stroke-dasharray:5 4;fill:rgba(120,130,160,.06)}.sred{stroke:var(--cb);stroke-dasharray:5 4;fill:rgba(234,35,40,.05)}
+.scb{fill:#ec1218}.scbt{fill:#fff;font-size:12.5px;font-weight:800}.scbs{fill:rgba(255,255,255,.85);font-size:10.5px}
+.sgold{fill:rgba(252,157,12,.16);stroke:#fc9d0c}.sline{stroke:var(--muted);stroke-width:1.3;fill:none;opacity:.55}.sline.x{stroke:var(--cb);opacity:.8;stroke-dasharray:3 4}
+.fade{transition:opacity .5s}.gone{opacity:0;pointer-events:none}
+.legend{display:flex;gap:16px;color:var(--muted);font-size:12px;margin-top:10px;flex-wrap:wrap}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+/* offline sim */
+.sim{display:grid;grid-template-columns:minmax(0,1fr) 300px 300px;gap:18px;align-items:start}
+.steps{display:grid;gap:10px}
+.step{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--panel);opacity:.55;transition:opacity .3s,border-color .3s,box-shadow .3s}
+.step.on{opacity:1;border-color:var(--gold);box-shadow:0 0 0 3px rgba(236,18,24,.12)}.step.done{opacity:1}
+.step .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--panel2);font-weight:800;font-size:12px;color:var(--fg2)}
+.step.done .n{background:rgba(19,128,75,.14);color:var(--green)}.step.on .n{background:var(--gold);color:#fff}
+.step h4{margin:0 0 2px;font-size:14.5px}.step p{margin:0;font-size:13px;color:var(--fg2)}
+.phone{border-radius:34px;background:#0b0b0b;padding:9px;box-shadow:0 24px 50px rgba(0,0,0,.28)}
+.screen{border-radius:26px;background:#f7f7f7;overflow:hidden;height:460px;display:flex;flex-direction:column;color:#000}
+.ph-top{background:#000;color:#fff;padding:12px 16px 14px}
+.ph-sb{display:flex;justify-content:space-between;font-size:11px;font-weight:700;opacity:.95}
+.ph-title{font-size:15px;font-weight:800;margin-top:10px}.ph-sub{font-size:11.5px;opacity:.75}
+.ph-body{padding:12px;display:grid;gap:10px;font-size:12.5px}
+.ph-card{background:#fff;border-radius:14px;padding:12px;border:1px solid #e2e6ef}
+.ph-card b{display:block;font-size:13px;margin-bottom:2px}
+.ph-pill{display:inline-block;margin-top:6px;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;background:#eef1f7;color:#5d6884}
+.ph-pill.warn{background:#fff3e0;color:#b26200}.ph-pill.ok{background:#e6f6ee;color:#13804b}.ph-pill.bad{background:#fdecec;color:#c0262d}.ph-pill.ocean{background:#fff0da;color:#a65f00}
+.ph-btn{margin-top:8px;text-align:center;background:#ec1218;color:#fff;font-weight:700;border-radius:10px;padding:7px}
+.ph-btn.off{background:#e2e6ef;color:#97a0b6}
+.ph-label{text-align:center;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:10px 0 0}
+.ph-err{background:#ffd5d6;color:#b30005;border-radius:12px;padding:10px;font-weight:700;font-size:12px}
+.simctl{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+/* table */
+table.cmp{width:100%;border-collapse:collapse;font-size:14px;background:var(--panel);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}
+table.cmp th,table.cmp td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+table.cmp th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--panel2)}
+table.cmp tr:last-child td{border-bottom:0}
+table.cmp td:first-child{font-weight:700;width:24%}
+.y,.p,.x{font-weight:800;margin-right:6px}.y{color:var(--green)}.p{color:var(--amber)}.x{color:var(--cb2)}
+table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+/* flow */
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:stretch}
+.flow .card{position:relative}.flow .card:not(:last-child)::after{content:"→";position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:800}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+.stat .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.stat .v{font-size:28px;font-weight:850;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.15;margin:4px 0}
+.stat .d{font-size:12.5px;color:var(--fg2)}
+.script{counter-reset:s;display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.script li{counter-increment:s;display:grid;grid-template-columns:30px 1fr;gap:10px;font-size:14px;color:var(--fg2)}
+.script li::before{content:counter(s);width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:rgba(236,18,24,.12);color:var(--gold2);font-weight:800;font-size:12px}
+.script b{color:var(--fg)}
+.notes{position:fixed;right:18px;bottom:18px;width:min(390px,calc(100vw - 36px));background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;z-index:20;display:none}
+.notes.open{display:block}.notes h4{margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold2)}
+.notes ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--fg2)}.notes li{margin:4px 0}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.disclaimer{color:var(--muted);font-size:12px;margin-top:28px;max-width:760px}
+@media (max-width:1100px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}.sim{grid-template-columns:1fr 1fr}.sim .steps{grid-column:1/-1}.flow{grid-template-columns:1fr 1fr}.flow .card::after{display:none}.stats{grid-template-columns:1fr 1fr}.scenario{grid-template-columns:1fr}}
+@media (max-width:700px){.g4,.g3,.g2,.sim,.flow,.stats{grid-template-columns:1fr}.dots{display:none}.bar .pill{display:none}.bar .brand{margin-right:auto}.bar{gap:8px;padding:10px 16px}.brand small{display:none}section.ch{padding:40px 16px}table.cmp{font-size:13px}}
+
+.jobs .card{border-top:4px solid var(--cb)}.jobs .card:nth-child(2){border-top-color:#fc9d0c}.jobs .card:nth-child(3){border-top-color:#7c0206}.jobs .card:nth-child(4){border-top-color:#333}.who{font-size:12.5px;color:var(--muted);margin-top:10px}.who b{color:var(--fg)}
+</style></head><body>
+<div class="bar">
+  <div class="brand"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Couchbase" viewBox="-16 -16 1472 302.97"><g class="wm" fill="#000"><path d="M1033.93,105.34h0c-14.55-7.89-33.28-7.85-47.69.48-3.34,1.93-6.48,4.39-8.96,7.27l-3.29,3.84v-61.44h-32.86v158.85h32.83l.09-14.35c3.16,4.16,6,7.29,10.07,9.88,7.14,4.55,15.18,6.69,23.75,7.1,31.14,1.47,53.82-24.31,55.44-54.66,1.25-23.32-8.68-45.76-29.38-56.97ZM1001.71,187.22c-15.99,0-28.95-12.95-28.95-28.95s12.95-28.95,28.95-28.95,28.94,12.96,28.94,28.95-12.95,28.95-28.94,28.95Z"/><path d="M894.38,100.27c-17.74-3.12-32.79.89-43.39,15.98v-60.76h-33.2v158.85h33.21s0-61.98,0-61.98c.76-12.4,7.92-22.47,20.62-22.66,4.7-.07,9.25.83,12.96,3.73,3.29,2.59,5.99,6.07,6.57,10.21l1.11,7.7v63.01h33.19v-69.21c-.19-10.23-1.57-19.1-6.92-28-5.34-8.91-13.93-14.88-24.15-16.87Z"/><path d="M424.21,178.18c-8.64,3.96-17.78,5.78-27.35,5.42-18.03-.52-34.7-11.62-41.76-28.12-5.59-13.04-5.6-27.71-.1-40.74,6.7-15.87,21.07-26.73,38.2-28.52,16.98-1.77,31.31,3.62,45.11,13.75v-36.25l-4.82-2.52-4.24-2c-19.48-9.2-45.43-8.61-65.05.31-19.8,9-34.66,23.89-42.67,44.14-7.26,18.36-7.59,39.66-1.71,58.32,5.3,16.84,15.94,31.25,30.44,41.12,2.79,1.9,5.52,3.65,8.53,5.08l4.87,2.31c24.62,10.33,51.54,8.89,74.89-4.31h.02l-.03-36.12c-4.9,3.26-9.32,5.83-14.34,8.14Z"/><path d="M1168.44,116.49l-3.64-4.27c-3.87-4.54-9.01-7.51-14.69-9.56-24.8-8.92-50.28,1.31-63.17,24.27-10.32,18.39-10.5,42.59-.81,61.3,12.18,23.46,38.39,34.81,63.43,25.68,7.94-2.89,13.86-7.86,18.79-14.08h0l.17,14.52h32.38v-112.18h-32.4l-.07,14.33ZM1140.76,187.21c-15.98,0-28.94-12.95-28.94-28.95s12.95-28.95,28.94-28.95,28.95,12.96,28.95,28.95-12.95,28.95-28.95,28.95Z"/><path d="M514.74,98.13c-33.22,0-60.14,26.93-60.14,60.14s26.92,60.14,60.14,60.14,60.14-26.93,60.14-60.14-26.93-60.14-60.14-60.14ZM514.73,186.73c-15.72,0-28.46-12.74-28.46-28.46s12.74-28.46,28.46-28.46,28.46,12.74,28.46,28.46-12.74,28.46-28.46,28.46Z"/><path d="M1432.87,128.52c-4.99-10.21-15.77-20.65-26.2-24.56l-5.18-1.93c-26.4-7.87-54.49,1.15-68.69,25.27l-3.42,6.82c-3.83,9.06-5.14,18.68-4.54,28.58,1.31,22.03,13.66,41.38,34.14,49.81,13.18,5.43,28.17,6.05,42.01,2.86,15.68-3.94,27.79-13.59,35.19-27.84l-28.07-11.13c-4.47,7.46-10.51,12.48-19.39,13.35h0c-5.19.57-10.16.52-14.66-1.55l-3.94-1.82-4.48-3.03c-4.13-2.8-8.26-10.07-8.47-15.98h82.41c1.32-13.45-.5-26.86-6.72-38.85ZM1407.45,145.83s0,0,0,0l-49.96.02c.99-8.37,6.92-14.84,14.67-18.47,6.89-3.24,15.56-2.8,22.51.42,2.93,1.36,5.26,3.51,7.51,5.79,2.86,3.33,4.53,6.97,5.27,12.24h0Z"/><path d="M664.35,161.76c-.16,10.07-3.48,19.7-12.85,23.59-3.55,1.47-7.36,1.71-11.18,1.32-11.47-1.17-16.54-11.21-16.67-22.42v-62.09h-33.09v71.54c.41,13.41,4.41,26.53,14.75,35.05,3.61,2.97,7.52,5.18,12.06,6.51,8.38,2.45,17.26,2.78,25.71.53,8.97-2.39,15.87-7.8,21.18-15.48l.13,14.03h33.07v-112.18h0s-33.11,0-33.11,0v59.6Z"/><path d="M1277.52,145.9l-16.5-4.34c-1.21-.32-2.98-1.42-4.01-2.08-2.38-1.53-3.41-3.85-3.22-6.52.15-2.29,1.72-4.47,4.04-5.72,10.07-4.48,20.17,2.74,24.08,12.42l26.91-14.27c-4.68-10.33-13.69-17.77-23.85-21.88l-9.63-3.08c-14.23-3.03-31.37-.23-42.53,9.31-7.35,6.27-11.49,15-11.74,24.72-.51,20.54,12.55,30.85,31.37,35.49l15.98,3.94c2.78.69,6.5,2.82,7.47,5.37,1.54,4.04-.68,8.37-4.84,9.84-11.29,4.06-22.36-3.12-27.28-14.03l-26.84,14.78c4.82,10.7,12.34,17.76,22.86,22.64,13.24,5.71,29.9,6.44,43.2,1.76,15.43-5.44,26.25-18.03,26.55-34.75.15-7.62-2.36-14.64-7.51-20.28-6.41-7.03-15.3-10.87-24.51-13.3Z"/><path d="M794.59,183.23c-17.04,8.68-39.52,3.32-45.72-15.11-4.79-14.22,1.09-30,15.27-36.16,12.67-5.32,26.77-2.54,37.81,5.52v-31.22c-13.9-8.07-32.93-8.72-48.14-4.04-19.71,6.17-34.19,22.1-38.46,42.24-4.36,20.54.97,43.78,16.92,57.93,14.92,13.25,34.94,17.31,54.4,13.47,5.53-1.09,10.48-3.07,15.51-5.86l-.02-31.04-7.56,4.27Z"/></g><g><circle fill="#ec1218" cx="135.48" cy="135.48" r="135.48"/><path fill="#fff" d="M54.17,102.96h32.52v32.52h97.57v-32.52h32.52v65.05H54.17v-65.05Z"/></g></svg><small>Harborline · mobile AI personalization demo</small></div>
+  <nav class="dots" id="dots" aria-label="Chapters"></nav>
+  <span class="pill" id="health">Demo: …</span>
+  <a class="btn sm" href="/login">Open the app ↗</a>
+  <button class="btn sm" id="theme" title="Toggle theme">☾</button>
+</div>
+<main id="main">
+
+<!-- 0 -->
+<section class="ch hero" data-notes="Open on the title. The claim for the next few minutes: one chatbot can serve the whole company - customers, prospects and employees - but only if it knows who it is talking to, keeps their knowledge apart, and doesn't call the model for every single question.|The Agent Operations Manager is where that happens: every answer goes through its Context Cache and LLM Cache, is grounded by a scoped Knowledge Base, and every action is a governed, audited tool call.|Where it ends: the live app, signed in as a customer, a prospect and a new hire, next to AOM's own pages.">
+  <div class="wrap">
+    <div class="kicker">Couchbase Harborline · Mobile AI personalization · Live demo</div>
+    <h1>One chatbot. <span class="accent">The whole company.</span></h1>
+    <p class="lede">Customer support, order tracking, sales and the internal IT and HR help desk in one assistant that knows who is asking, answers from their own data, acts in one tap - and <b>keeps answering with no signal</b>. Why that takes a database on the phone as well as in the cloud, why <b class="cbc">Couchbase</b> covers both, and how it stops you paying a model for the same answer twice.</p>
+    <div class="cta"><button class="btn primary" data-go="1">Start the story →</button><a class="btn" href="/login">Skip to the live app</a></div>
+    <p class="disclaimer">A demo scenario built for illustration. Harborline, the company in it, is fictional; its people, prices and policies are invented.</p>
+  </div>
+</section>
+
+<!-- 1 -->
+<section class="ch alt" data-notes="The four jobs every company-wide chatbot gets asked to do. Each column is a team that today runs its own bot, its own knowledge base and its own bill.|In the demo each job has a person: Maya the customer covers support and e-commerce, Daniel the office manager covers lead generation and sales, Sofia the new hire covers IT and HR.|The point of one chatbot is not one prompt. It is one data plane: one place the profiles, the knowledge, the caches, the memory and the audit trail live.">
+  <div class="wrap">
+    <div class="kicker">Chapter 1 · The brief</div>
+    <h2>Four jobs. Usually <span class="accent">four chatbots</span>.</h2>
+    <p class="lede">Support, commerce, sales and the internal help desk each buy a bot, a vector store and a model contract. Harborline does all four on one data plane - and the app shows which desk answered every message.</p>
+    <div class="grid g4 jobs">
+      <div class="card"><span class="icon">🛟</span><h3>Customer Support &amp; FAQs</h3><p>Store hours, delivery times, return policy, pricing, account details. Asked thousands of times a day in almost the same words.</p><ul><li>Answered once, cached for everyone</li><li>Account answers from the customer's own record</li><li>Service recovery with supervisor approval</li></ul><p class="who"><b>Maya Chen</b> · Gold member</p></div>
+      <div class="card"><span class="icon">📦</span><h3>E-Commerce &amp; Order Tracking</h3><p>Order status and tracking, delivery changes, returns and exchanges, and the cart someone walked away from.</p><ul><li>"Where is my order?" from live order data</li><li>Returns run by a dedicated agent with memory</li><li>Cart recovery with a one-tap checkout</li></ul><p class="who"><b>Maya Chen</b> · a desk in transit, a chair to exchange</p></div>
+      <div class="card"><span class="icon">💼</span><h3>Lead Generation &amp; Sales</h3><p>Guide product discovery, capture contact details, qualify the lead and book a consultation - without a form.</p><ul><li>Package sized to the prospect's team</li><li>Headcount, budget, timeline → a lead score</li><li>Consultation slots, bookable offline</li></ul><p class="who"><b>Daniel Okafor</b> · office manager, 28 people</p></div>
+      <div class="card"><span class="icon">🪪</span><h3>Internal Operations &amp; HR</h3><p>IT help desk requests, benefits questions and onboarding paperwork - for employees only.</p><ul><li>Password resets, tickets, system access</li><li>Benefits enrollment and time off</li><li>Onboarding forms signed in the chat</li></ul><p class="who"><b>Sofia Alvarez</b> · new hire, day 6</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="ch" data-notes="This is where a company-wide chatbot goes wrong. Three of the four are cost: tokens in, tokens out, per question - and the prompt for a personal question is big. The fourth is the one that gets a project cancelled: the bot telling a customer something from the HR handbook.|The top row is the problems. The bottom row is what AOM and Couchbase do about each one. Everything on this slide is running in the live demo.|The one most teams miss is the last column: an answer served from the phone costs nothing, and that only works if the cached context is a document that syncs.">
+  <div class="wrap">
+    <div class="kicker">Chapter 2 · What goes wrong</div>
+    <h2>Four things break a company-wide chatbot. <span class="accent">Each one has a fix.</span></h2>
+    <p class="lede">The model's price per token is the smallest part of it. What matters is how often you call it, how much you send it - and what it is allowed to see.</p>
+    <div class="grid g4">
+      <div class="card"><div class="num">1</div><h3>Repeat questions</h3><p>Store hours, the return policy, how to reset a password: the same for everyone who asks. Generating each one again is pure waste.</p><span class="tag">calls × people</span></div>
+      <div class="card"><div class="num">2</div><h3>Context rebuilt every turn</h3><p>A personal answer needs the person's record from the CDP, CRM or HRIS, the relevant policy and live data. Rebuilding and re-sending that for every question is the largest prompt in the app.</p><span class="tag">tokens per call</span></div>
+      <div class="card"><div class="num">3</div><h3>One bot, everyone's knowledge</h3><p>Put the Help Center and the HR handbook in one vector store and a shopper's question can retrieve a benefits policy - or another person's profile.</p><span class="tag">the risk</span></div>
+      <div class="card"><div class="num">4</div><h3>No answer offline</h3><p>On a train, a shop floor or a loading dock there is no signal. Every question that can't be answered becomes a call later, or a lost sale.</p><span class="tag">the hidden cost</span></div>
+      <div class="card"><h3>LLM Cache</h3><p>The second person to ask a shared question gets the first person's answer: an exact or semantic hit, zero tokens. Shared answers hold no personal data, so sharing them is safe.</p><span class="tag cb">Couchbase LLM Cache</span></div>
+      <div class="card"><h3>Context Cache</h3><p>The context assembled for a person and topic is cached with a key of user, intent, export date and profile revision. Follow-ups reuse it; a new export or anything the person does invalidates it.</p><span class="tag cb">Couchbase Context Cache</span></div>
+      <div class="card"><h3>Two scoped RAG applications</h3><p>A customer app scoped to the Help Center and a workplace app scoped to the Team Handbook. An audience gate routes by who is signed in; personal retrieval is filtered to the asker's own profile document.</p><span class="tag cb">Knowledge Bases · RBAC · Sync Gateway channels</span></div>
+      <div class="card"><h3>Answers on the phone</h3><p>The cached context is also a Couchbase document that syncs to the device, so Harborline answers offline from Couchbase Lite - and queues the return, the booking or the signed form until it reconnects.</p><span class="tag cb">Couchbase Lite · Sync Gateway</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="ch alt" data-notes="How the chatbot usually gets built: a vector database per team, a semantic cache, a session store, a primary database, an LLM gateway, and a sync layer the app team writes. Every grey box is a bill and an integration; every red one is code to own.|Press Transform. Couchbase Server is the document store, the vector index and the memory-first cache; AOM is the gateway, the caches, the knowledge base and the governance; Couchbase Lite and Sync Gateway carry the cached context to the phone, by channel.|The cost argument is not only tokens: it is the number of systems between the question and the answer.">
+  <div class="wrap">
+    <div class="kicker">Chapter 3 · How it usually gets built</div>
+    <h2>Every box between the question and the answer <span class="accent">is a bill</span>.</h2>
+    <p class="lede">The usual AI-chat stack spreads one conversation over half a dozen services and a sync layer the app team builds - then repeats it per department. Press <b>Transform</b> to see what one Couchbase data plane and the Agent Operations Manager replace.</p>
+    <div class="diagram">
+      <div class="head"><span id="diagHint">Grey dashed boxes are separate services to license, run and keep consistent. Red dashed is code your team writes and maintains.</span><button class="btn primary sm" id="transform">↻ Transform the stack</button></div>
+      <svg id="diag" viewBox="0 0 1140 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stack comparison">
+        <g><rect x="16" y="120" width="150" height="200" rx="22" class="sb"/><text x="91" y="150" text-anchor="middle" class="st">The phone</text><text x="91" y="170" text-anchor="middle" class="ss">customer · prospect · employee</text></g>
+        <g><rect x="964" y="146" width="160" height="148" rx="12" class="sb"/><text x="1044" y="174" text-anchor="middle" class="st">Systems of record</text><text x="1044" y="196" text-anchor="middle" class="ss">CDP + commerce: customers,</text><text x="1044" y="211" text-anchor="middle" class="ss">orders, carts, scores</text><text x="1044" y="230" text-anchor="middle" class="ss">CRM: leads</text><text x="1044" y="249" text-anchor="middle" class="ss">HRIS + ITSM: team members</text><text x="1044" y="272" text-anchor="middle" class="ss">CMS: Help Center, Handbook</text></g>
+        <g id="sprawl" class="fade">
+          <rect x="30" y="236" width="122" height="64" rx="10" class="sred"/><text x="91" y="262" text-anchor="middle" class="st">SQLite</text><text x="91" y="280" text-anchor="middle" class="ss">+ your own schema</text>
+          <rect x="210" y="40" width="200" height="58" rx="10" class="sred"/><text x="310" y="65" text-anchor="middle" class="st">Custom sync API</text><text x="310" y="83" text-anchor="middle" class="ss">delta tracking, retries, queues</text>
+          <rect x="210" y="116" width="200" height="58" rx="10" class="sred"/><text x="310" y="141" text-anchor="middle" class="st">Prompt assembly code</text><text x="310" y="159" text-anchor="middle" class="ss">profile + policy + history, every turn</text>
+          <rect x="210" y="192" width="200" height="58" rx="10" class="sred"/><text x="310" y="217" text-anchor="middle" class="st">Audience &amp; access layer</text><text x="310" y="235" text-anchor="middle" class="ss">who may read / write what</text>
+          <rect x="210" y="268" width="200" height="58" rx="10" class="sbad"/><text x="310" y="293" text-anchor="middle" class="st">Session / chat store</text><text x="310" y="311" text-anchor="middle" class="ss">history re-sent per question</text>
+          <rect x="460" y="40" width="200" height="58" rx="10" class="sbad"/><text x="560" y="65" text-anchor="middle" class="st">Semantic cache</text><text x="560" y="83" text-anchor="middle" class="ss">separate caching product</text>
+          <rect x="460" y="116" width="200" height="58" rx="10" class="sbad"/><text x="560" y="141" text-anchor="middle" class="st">Primary database</text><text x="560" y="159" text-anchor="middle" class="ss">orders, leads, tickets, requests</text>
+          <rect x="460" y="192" width="200" height="58" rx="10" class="sbad"/><text x="560" y="217" text-anchor="middle" class="st">Cache sync / CDC</text><text x="560" y="235" text-anchor="middle" class="ss">keep cache = database</text>
+          <rect x="460" y="268" width="200" height="58" rx="10" class="sbad"/><text x="560" y="293" text-anchor="middle" class="st">Vector database × teams</text><text x="560" y="311" text-anchor="middle" class="ss">support, sales, HR - one each</text>
+          <rect x="710" y="116" width="200" height="58" rx="10" class="sbad"/><text x="810" y="141" text-anchor="middle" class="st">LLM gateway + governance</text><text x="810" y="159" text-anchor="middle" class="ss">keys, limits, audit, approvals</text>
+          <rect x="710" y="192" width="200" height="58" rx="10" class="sbad"/><text x="810" y="217" text-anchor="middle" class="st">ETL jobs</text><text x="810" y="235" text-anchor="middle" class="ss">sources → DB → cache → vectors</text>
+          <path d="M166 220 C190 220 190 69 210 69" class="sline x"/><path d="M166 220 C190 220 190 145 210 145" class="sline x"/><path d="M166 220 L210 221" class="sline x"/>
+          <path d="M410 69 L460 69 M410 145 L460 145 M410 221 L460 221 M410 297 L460 297 M660 145 L710 145 M660 221 L710 221 M910 221 L964 221" class="sline"/>
+          <text x="91" y="352" text-anchor="middle" class="ss" fill="#b30005">offline: no answers</text>
+        </g>
+        <g id="cb" class="fade gone">
+          <rect x="26" y="236" width="130" height="64" rx="10" class="scb"/><text x="91" y="262" text-anchor="middle" class="scbt">Couchbase Lite</text><text x="91" y="280" text-anchor="middle" class="scbs">cached context · catalog</text>
+          <rect x="250" y="160" width="190" height="120" rx="14" class="scb"/><text x="345" y="196" text-anchor="middle" class="scbt">Sync Gateway</text><text x="345" y="216" text-anchor="middle" class="scbs">delta sync, both ways</text><text x="345" y="234" text-anchor="middle" class="scbs">channels: user · catalog · employees</text><text x="345" y="252" text-anchor="middle" class="scbs">HR never reaches a customer</text>
+          <rect x="520" y="110" width="260" height="220" rx="16" class="scb"/><text x="650" y="146" text-anchor="middle" class="scbt">Couchbase Server</text><text x="650" y="168" text-anchor="middle" class="scbs">memory-first JSON + key-value</text><text x="650" y="186" text-anchor="middle" class="scbs">SQL++ · indexes · vector search</text><text x="650" y="204" text-anchor="middle" class="scbs">system of record and cache</text>
+          <rect x="545" y="230" width="210" height="80" rx="12" fill="#fff" stroke="#fc9d0c" stroke-width="2"/><text x="650" y="258" text-anchor="middle" style="fill:#000;font-size:12.5px;font-weight:800">Agent Operations Manager</text><text x="650" y="276" text-anchor="middle" style="fill:#333;font-size:10.5px">LLM Cache · Context Cache · Memory</text><text x="650" y="292" text-anchor="middle" style="fill:#333;font-size:10.5px">Knowledge Base · 2 RAG apps · governance</text>
+          <path d="M166 270 L250 230 M440 220 L520 220 M780 220 L964 220" class="sline" style="opacity:.9;stroke-width:2"/>
+          <text x="208" y="236" text-anchor="middle" class="ss">sync</text><text x="872" y="210" text-anchor="middle" class="ss">nightly export · live lookup</text>
+          <text x="91" y="352" text-anchor="middle" class="ss" fill="#0b7a2b">offline: answers, at no cost</text>
+        </g>
+      </svg>
+      <div class="legend"><span><i style="background:rgba(120,130,160,.25);border:1px dashed #9aa3b8"></i>a separate service</span><span><i style="background:rgba(236,18,24,.08);border:1px dashed #ec1218"></i>custom code to build and own</span><span><i style="background:#ec1218"></i>Couchbase</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="ch" data-notes="Walk the same five questions through two chatbots. Press Next for each step. The tally at the bottom of each phone is the running LLM spend.|Left is Harborline on AOM: the first shared answer is generated once; Daniel's identical question is an LLM-cache hit; Maya's order question builds context once and the follow-up reuses it; offline, the phone answers from Couchbase Lite.|Right is a plain chatbot: every question is a full-price model call with the whole prompt rebuilt, and offline it has nothing to say.|The dollar figures are illustrative - about 2,000 tokens per generated answer at a blended $4 per million. The ratio is the point, not the cents.">
+  <div class="wrap">
+    <div class="kicker">Chapter 4 · The same questions, two bills</div>
+    <h2>Five questions: <span class="accent">three model calls instead of five</span>, and an answer offline.</h2>
+    <p class="lede">The same people ask the same things of two chatbots: one that runs through the Agent Operations Manager with its context on the phone, and one that calls the model every time.</p>
+    <div class="sim">
+      <div>
+        <div class="steps" id="steps">
+          <div class="step"><div class="n">1</div><div><h4>Maya: "What is your return policy?"</h4><p>A shared question. <b>AOM:</b> the customer RAG app retrieves the scoped Help Center, generates once, and caches the answer. <b>Plain chatbot:</b> generates.</p></div></div>
+          <div class="step"><div class="n">2</div><div><h4>Daniel asks the same thing</h4><p><b>AOM:</b> LLM Cache exact hit - no tokens, no latency. Shared answers carry no personal data, so sharing is safe. <b>Plain chatbot:</b> generates again.</p></div></div>
+          <div class="step"><div class="n">3</div><div><h4>Maya: "Where is my order?"</h4><p>A personal question. <b>AOM:</b> builds her context once (her CDP record, her profile document, live order data), stores it in the Context Cache and in Couchbase, then generates. <b>Plain chatbot:</b> rebuilds the whole prompt and generates.</p></div></div>
+          <div class="step"><div class="n">4</div><div><h4>Maya: "Can I reschedule my delivery?"</h4><p><b>AOM:</b> Context Cache hit - a short call on the cached context, with memory of the earlier turn. <b>Plain chatbot:</b> the full prompt again, plus the history.</p></div></div>
+          <div class="step"><div class="n">5</div><div><h4>On the subway, no signal: "When does my desk arrive?"</h4><p><b>AOM:</b> her orders and the cached context already synced to her phone; Couchbase Lite answers. <b>Plain chatbot:</b> can't reach the server.</p></div></div>
+        </div>
+        <div class="simctl"><button class="btn primary" id="simNext">Next step →</button><button class="btn" id="simReset">Start over</button></div>
+      </div>
+      <div><div class="phone"><div class="screen">
+        <div class="ph-top"><div class="ph-sb"><span>8:12</span><span id="cbSig">●●● Wi-Fi</span></div><div class="ph-title">Harborline</div><div class="ph-sub">Governed by Couchbase AOM</div></div>
+        <div class="ph-body" id="cbBody"></div></div></div><p class="ph-label">With Couchbase AIDP</p></div>
+      <div><div class="phone"><div class="screen">
+        <div class="ph-top" style="background:#5c5c5c"><div class="ph-sb"><span>8:12</span><span id="rdSig">●●● Wi-Fi</span></div><div class="ph-title">Chat</div><div class="ph-sub">Plain LLM chatbot</div></div>
+        <div class="ph-body" id="rdBody"></div></div></div><p class="ph-label">A model call per question</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="ch alt" data-notes="Follow the data left to right: the nightly export of customers, leads and team members lands in Couchbase; the Help Center and Team Handbook are republished to the Knowledge Base as two documents; Harborline is two registered RAG applications in AOM with their caches.|The context cache is the one to dwell on: the context assembled for Maya's question is cached in AOM, and the same document syncs to her phone. That is why Harborline can still answer offline, for free.|The numbers on this page are live from the running demo: cache hit rates, the model calls avoided since the backend started, and how the questions split across the four jobs. AOM's own RAG Applications page keeps the durable view.">
+  <div class="wrap">
+    <div class="kicker">Chapter 5 · One data plane for the AI</div>
+    <h2>Build the context once. <span class="accent">Reuse it everywhere</span> - including the phone.</h2>
+    <p class="lede">What the stack on the right-hand side of chapter 3 looks like in motion, with live numbers from this demo.</p>
+    <div class="flow">
+      <div class="card"><span class="icon">🗂️</span><h3>Systems of record</h3><p>Every night an export lands: one row per customer, lead and team member, with orders, lead status, onboarding tasks, segments and scores. During the day a live lookup supplies the current record when a context is built.</p></div>
+      <div class="card"><span class="icon">🗄️</span><h3>Couchbase Server</h3><p>Profiles upserted, feeds ranked with live stock and slots, the request queue, and the things people do in chat.</p></div>
+      <div class="card"><span class="icon">📚</span><h3>AOM Knowledge Base</h3><p>Today's Help Center and Team Handbook plus a profile per person. Two RAG apps, one per knowledge document; personal retrieval scoped to the asker.</p></div>
+      <div class="card"><span class="icon">⚡</span><h3>Context &amp; LLM cache</h3><p>Context per person and topic - the source lookup, retrieval and live facts, assembled once - invalidated by the next export or any action. Shared answers reused across people.</p></div>
+      <div class="card"><span class="icon">📱</span><h3>On the phone</h3><p>The same context document syncs through Sync Gateway, on the person's own channel, so Harborline answers offline at no cost.</p></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">Harborline answers</div><div class="v" id="m_turns">-</div><div class="d" id="m_turnsd">since the backend started</div></div>
+      <div class="stat"><div class="k">LLM cache</div><div class="v" id="m_llm">-</div><div class="d" id="m_llmd">of model calls answered from AOM's LLM Cache</div></div>
+      <div class="stat"><div class="k">Context cache</div><div class="v" id="m_ctx">-</div><div class="d" id="m_ctxd">of personal questions reused cached context</div></div>
+      <div class="stat"><div class="k">Model calls avoided</div><div class="v" id="m_saved">-</div><div class="d" id="m_savedd">cache hits plus answers served on the phone</div></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">Customer Support</div><div class="v" id="a_support">-</div><div class="d">FAQs, accounts, service recovery</div></div>
+      <div class="stat"><div class="k">Orders &amp; Returns</div><div class="v" id="a_commerce">-</div><div class="d">tracking, returns, carts</div></div>
+      <div class="stat"><div class="k">Sales</div><div class="v" id="a_sales">-</div><div class="d">discovery, leads, consultations</div></div>
+      <div class="stat"><div class="k">IT &amp; HR</div><div class="v" id="a_workplace">-</div><div class="d" id="a_gate">help desk, benefits, onboarding</div></div>
+    </div>
+    <p class="src" id="m_note">*Spend avoided is based on LLM provider list pricing from public reference - 2,000 tokens per generated answer at a blended $4 per million tokens.</p>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="ch" data-notes="The summary table. Read it by rows: each kind of question, what it costs with a model call every time, what it costs through AOM.|The first two rows are the LLM cache: the whole company shares one generated answer per shared question, per knowledge version.|Rows three and four are the context cache: build once per person and topic, invalidate on new data. Row five is Couchbase Lite: zero. Row six is the one-chatbot row: who may hear what. Row seven is governance - AOM also caps what any agent can spend, and holds the risky actions for a person.">
+  <div class="wrap">
+    <div class="kicker">Chapter 6 · Where the savings come from</div>
+    <h2>Question by question, <span class="accent">with and without AOM</span>.</h2>
+    <p class="lede">Illustrative per-answer costs for the questions in chapter 4. The ratio is what matters: most of a company chatbot's traffic is in the cheap rows.</p>
+    <table class="cmp">
+      <thead><tr><th>Question</th><th>With Couchbase AIDP</th><th>A model call every time</th></tr></thead>
+      <tbody>
+        <tr><td>Shared question, first time today</td><td><span class="p">~</span>One generated answer from a scoped RAG app: a small prompt (that knowledge document's chunks only), then cached in the LLM Cache.<small>≈ 1,500 tokens</small></td><td><span class="x">✗</span>Generated, with whatever the retriever found across the whole store.<small>≈ 2,000-4,000 tokens</small></td></tr>
+        <tr><td>Same shared question, anyone else</td><td><span class="y">✓</span>LLM Cache exact hit; a reworded version is a semantic hit. Zero tokens, zero latency.<small>0 tokens</small></td><td><span class="x">✗</span>Generated again, for every person, every time.<small>≈ 2,000-4,000 tokens</small></td></tr>
+        <tr><td>Personal question, first time</td><td><span class="p">~</span>Context built once: this person's source record, their KB profile, knowledge chunks and live tool facts, stored in the Context Cache and in Couchbase.<small>≈ 2,000 tokens</small></td><td><span class="x">✗</span>Profile, policy and history concatenated into the prompt by application code.<small>≈ 3,000-6,000 tokens</small></td></tr>
+        <tr><td>Follow-up on the same topic</td><td><span class="y">✓</span>Context Cache hit plus AOM Agent Memory (what the person said, and what the Returns Agent did): a short call on cached context. Invalidated only by a new export or an action.<small>≈ 600 tokens</small></td><td><span class="x">✗</span>The full prompt again, now with the chat history appended.<small>grows every turn</small></td></tr>
+        <tr><td>Any question with no signal</td><td><span class="y">✓</span>Answered from the profile, cached context and FAQ in Couchbase Lite; actions queue and sync later.<small>0 tokens, no network</small></td><td><span class="x">✗</span>No answer; a support call later.<small>the hidden cost</small></td></tr>
+        <tr><td>A customer asks an HR question</td><td><span class="y">✓</span>The audience gate refuses before anything is retrieved; the workplace RAG app and the <code>employees</code> sync channel are never in a customer's path.<small>0 tokens, nothing leaked</small></td><td><span class="x">✗</span>Depends on a prompt instruction holding - over one shared vector store.</td></tr>
+        <tr><td>Who gets to act, and spend</td><td><span class="y">✓</span>AOM identities scoped per agent, RBAC, budgets and rate limits, traces with cost per answer, audit, human approval for goodwill credits and privileged access.</td><td><span class="p">~</span>A separate gateway and governance product, or nothing.</td></tr>
+      </tbody>
+    </table>
+    <p class="src">Token figures are illustrative demo values for a chatbot of this shape; AOM's traces show the real count per answer. Couchbase Lite: <a href="https://docs.couchbase.com/couchbase-lite/current" target="_blank" rel="noopener">documentation</a>.</p>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="ch alt" data-notes="Hand off to the live app, and open AOM next to it.|Run the script: a shared question as Maya (miss), the same as Daniel (exact hit), a personal question twice (context cache built, then hit), the internal question a customer shouldn't get an answer to, then Profile → Offline mode and ask again (answered on device).|Open AOM's RAG Applications page for insurance-assistant and insurance-workplace: queries, cache hits and savings. Then the LLM Cache and Context Cache pages, the Approvals queue, and a trace for one answer.">
+  <div class="wrap">
+    <div class="kicker">See it run</div>
+    <h2>Now watch the <span class="accent">meter not move</span>.</h2>
+    <p class="lede">The live demo runs the right-hand side of chapter 3: Couchbase Lite (in the browser preview, the same documents over REST), Sync Gateway, Couchbase Server and the Agent Operations Manager.</p>
+    <div class="grid g3">
+      <div class="card"><h3>The Harborline app</h3><p>Sign in as Maya (customer), Daniel (prospect) or Sofia (new hire) - each from today's export.</p><a class="btn primary" href="/login" style="margin-top:12px">Open the app →</a></div>
+      <div class="card"><h3>Agent Operations Manager</h3><p>Harborline's two RAG applications with their cache hits and savings, the LLM and Context Cache pages, traces with cost per answer, Agent Memory and the approval queue.</p><a class="btn" id="aomLink" target="_blank" rel="noopener" href="#" style="margin-top:12px">Open AOM ↗</a></div>
+      <div class="card"><h3>The demo, live</h3><p id="liveLine">Checking the backend…</p><a class="btn" href="/api/status" target="_blank" style="margin-top:12px">Backend status ↗</a></div>
+    </div>
+    <div class="card" style="margin-top:14px"><h3 style="margin-bottom:10px">A six-minute script</h3>
+      <ol class="script">
+        <li><span><b>Pay once.</b> Sign in as Maya and ask "What is your return policy?" The chips show <code>LLM cache · miss</code>: the customer RAG app generated it from the scoped Help Center.</span></li>
+        <li><span><b>Share it.</b> Sign in as Daniel and ask the same thing: <code>LLM cache · exact hit</code>. Reword it: a semantic hit. Open AOM's RAG Applications page - the hit is counted against <code>insurance-assistant</code>.</span></li>
+        <li><span><b>Build context once.</b> As Maya: "Where is my order?" shows <code>Context cache · built</code> and the CDP round trip. Ask when the package arrives: <code>Context cache · hit</code>. Open <b>sources</b>: her own profile and the Help Center, nothing else.</span></li>
+        <li><span><b>Try the wrong door.</b> Still as Maya: "How do I reset my VPN password?" The <b>Audience gate</b> refuses, and nothing was retrieved. Sign in as Sofia and ask it: answered from the Team Handbook by <code>insurance-workplace</code>. Profile → Offline &amp; sync shows her <code>employees</code> channel.</span></li>
+        <li><span><b>Go offline.</b> As Maya, Profile → Offline mode. Ask about the order again: <b>Answered on device · Couchbase Lite</b>. Start the chair exchange from For You; it shows "On device".</span></li>
+        <li><span><b>Back online.</b> Turn Offline mode off: the exchange syncs and <b>Confirm</b> triggers the <i>Harborline Returns Agent</i> - a second AOM identity scoped to the order-and-return tools. It recalls her return history from <b>AOM Agent Memory</b>, processes the exchange as a governed tool call, and remembers the outcome. Then "My keyboard arrived with a broken key…" → request the store credit, and approve it in AOM → Approvals.</span></li>
+      </ol>
+    </div>
+    <div class="card" style="margin-top:14px" id="workloadCard">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div><h3 style="margin-bottom:6px">The whole company, at once</h3>
+          <p style="margin:0">Replay a real queue: customers from every region, prospects and team members from every department ask Harborline what such people ask - hours, delivery, returns, order status, carts, quotes, passwords, VPN, benefits, onboarding - through the same AOM RAG apps, Context Cache, LLM Cache and Agent Memory path the phone uses. Then watch AOM's <b>LLM Cache</b> and <b>Context Cache</b> pages.</p></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <label style="font-size:13px">people/group <input id="wlUsers" type="number" min="1" max="1000" value="3" style="width:64px;font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px"></label>
+          <label style="font-size:13px">concurrent <input id="wlConc" type="number" min="1" max="64" value="4" style="width:52px;font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px"></label>
+          <span id="wlEst" style="font-size:12px;color:var(--muted)"></span>
+          <button class="btn primary" id="wlRun">Run company workload</button>
+          <button class="btn primary" id="wlRun24" title="300 people per group, 4 concurrent sessions, paced over 24 hours with a day/night traffic curve">Run for 24 hours</button>
+          <button class="btn" id="wlStop" style="display:none">Stop</button>
+          <button class="btn" id="rsRun" title="Personas back to today's export: requests, chat, cached context, orders, leads, tickets, onboarding; AOM memories and Harborline's cache namespaces">Reset demo</button>
+        </div>
+      </div>
+      <p id="wlLine" style="margin:10px 0 0;font-size:14px;color:var(--muted)">Idle. <code>python scripts/run_chatbot_workload.py</code> does the same from a terminal, with a per-group report.</p>
+      <div class="stats" id="wlStats" style="display:none">
+        <div class="stat"><div class="k">Turns</div><div class="v" id="wl_turns">-</div><div class="d" id="wl_turnsd">people · groups</div></div>
+        <div class="stat"><div class="k">LLM cache</div><div class="v" id="wl_llm">-</div><div class="d" id="wl_llmd">exact + semantic hits</div></div>
+        <div class="stat"><div class="k">Context cache</div><div class="v" id="wl_ctx">-</div><div class="d" id="wl_ctxd">follow-ups that reused context</div></div>
+        <div class="stat"><div class="k">Tokens saved</div><div class="v" id="wl_tok">-</div><div class="d" id="wl_tokd">as AOM counts them</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<aside class="notes" id="notes"><h4>Talking points</h4><ul id="notesList"></ul></aside>
+<script>
+const $=s=>document.querySelector(s); const chapters=[...document.querySelectorAll('section.ch')];
+// ---- navigation
+const dots=$('#dots'); chapters.forEach((c,i)=>{const b=document.createElement('button'); b.title='Chapter '+i; b.onclick=()=>go(i); dots.appendChild(b);});
+let cur=0; function go(i){i=Math.max(0,Math.min(chapters.length-1,i)); chapters[i].scrollIntoView({behavior:'smooth',block:'start'});}
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(+b.dataset.go));
+const io=new IntersectionObserver(es=>{for(const e of es){if(e.isIntersecting){cur=chapters.indexOf(e.target); [...dots.children].forEach((d,i)=>d.classList.toggle('on',i===cur)); renderNotes();}}},{threshold:.55});
+chapters.forEach(c=>io.observe(c));
+document.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();go(cur+1);} if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(cur-1);}
+  const k=e.key.toLowerCase(); if(k==='n'){toggleNotes();} if(k==='t'&&cur===3){transform();} if(k===' '&&cur===4){e.preventDefault();simNext();} });
+// ---- notes
+function renderNotes(){const n=(chapters[cur].dataset.notes||'').split('|').filter(Boolean); $('#notesList').innerHTML=n.map(x=>`<li>${x}</li>`).join('');}
+function toggleNotes(){$('#notes').classList.toggle('open'); renderNotes();}
+renderNotes();
+// ---- theme
+function setTheme(t){document.documentElement.dataset.theme=t; $('#theme').textContent=t==='dark'?'☀':'☾'; try{localStorage.setItem('insurance-story-theme',t)}catch(e){}}
+try{setTheme(localStorage.getItem('insurance-story-theme')||'light')}catch(e){setTheme('light')}
+$('#theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+// ---- diagram
+let transformed=false;
+function transform(){transformed=!transformed; $('#sprawl').classList.toggle('gone',transformed); $('#cb').classList.toggle('gone',!transformed);
+  $('#transform').textContent=transformed?'↺ Show the mixed product stack':'↻ Transform the stack';
+  $('#diagHint').textContent=transformed?'One set of JSON documents from the phone to the cloud: Couchbase Lite, Sync Gateway, Couchbase Server, and AOM for the AI.':'Grey dashed boxes are separate services to license, run and keep consistent. Red dashed is code your team writes and maintains.';}
+$('#transform').onclick=transform;
+// ---- cost simulation: per step [cb signal, cb body, plain signal, plain body]
+const COST_FULL=0.008, COST_PERSONAL=0.012, COST_FOLLOW=0.0024, COST_PLAIN_FOLLOW=0.016; // illustrative USD per answer
+let cbSpend=0, rdSpend=0;
+function tally(spend,calls,label){return `<div class="ph-card" style="margin-top:auto"><b>LLM spend so far: $${spend.toFixed(3)}</b>${calls} model call${calls===1?'':'s'}${label?' · '+label:''}</div>`}
+const S=[
+  ['●●● Wi-Fi', card('Harborline','Ask me about orders, returns, products - or anything about Harborline.','Ready','ok')+tally(0,0,''),
+   '●●● Wi-Fi', card('Chat','How can I help?','Ready','ok')+tally(0,0,'')],
+  ['●●● Wi-Fi', q("What is your return policy?")+card('30 days from delivery for a full refund - 45 for Gold, 60 for Platinum. Returns are free…','Customer RAG app · Help Center only','LLM cache · miss','warn')+tally(COST_FULL,1,'cached for everyone'),
+   '●●● Wi-Fi', q("What is your return policy?")+card('30 days from delivery for a full refund; longer for members…','Full prompt generated','Model call','bad')+tally(COST_FULL,1,'')],
+  ['●●● Wi-Fi', q("Daniel: What is your return policy?")+card('30 days from delivery for a full refund - 45 for Gold, 60 for Platinum…','Same answer, served from AOM','LLM cache · exact hit','ok')+tally(COST_FULL,1,'0 tokens'),
+   '●●● Wi-Fi', q("Daniel: What is your return policy?")+card('30 days from delivery for a full refund…','Generated again','Model call','bad')+tally(COST_FULL*2,2,'')],
+  ['●●● Wi-Fi', q('Where is my order?')+card('Your Arc Standing Desk is shipped with Harborline Delivery and arrives Sunday, 12pm-4pm. You can move the day.','Your CDP record + profile + live orders','Context cache · built','ocean')+tally(COST_FULL+COST_PERSONAL,2,'context stored in AOM + Couchbase'),
+   '●●● Wi-Fi', q('Where is my order?')+card('Your desk has shipped and arrives Sunday.','Profile, policy and history re-sent','Model call · 5k tokens','bad')+tally(COST_FULL*2+COST_PERSONAL,3,'')],
+  ['●●● Wi-Fi', q('Can I reschedule my delivery?')+card('Yes - any day through the 25th, in a four-hour window. Tap to pick a new day.','Cached context + memory of the last turn','Context cache · hit','ok')+btn('Move the delivery day')+tally(COST_FULL+COST_PERSONAL+COST_FOLLOW,3,'short call'),
+   '●●● Wi-Fi', q('Can I reschedule my delivery?')+card('Yes, you can change the delivery day.','Full prompt + history again','Model call · 6k tokens','bad')+tally(COST_FULL*2+COST_PERSONAL+COST_PLAIN_FOLLOW,4,'')],
+  ['No service', q('When does my desk arrive?')+card('From your phone: the Arc Standing Desk arrives Sunday, 12pm-4pm. Live tracking updates when you\'re back online.','Answered from the documents on this phone','Couchbase Lite · 0 tokens','ok')+tally(COST_FULL+COST_PERSONAL+COST_FOLLOW,3,'5 questions, 3 calls'),
+   'No service', q('When does my desk arrive?')+`<div class="ph-err">Can't reach the assistant. Check your connection.</div>`+tally(COST_FULL*2+COST_PERSONAL+COST_PLAIN_FOLLOW,4,'4 answers, 4 calls')],
+];
+function q(t){return `<div class="ph-card" style="background:#000;color:#fff;border-color:#000"><b style="color:#fff">${t}</b></div>`}
+function card(t,s,p,tone){return `<div class="ph-card"><b>${t}</b>${s}<br><span class="ph-pill ${tone}">${p}</span></div>`}
+function btn(l,off){return `<div class="ph-btn${off?' off':''}">${l}</div>`}
+let st=0; const steps=[...document.querySelectorAll('#steps .step')];
+function renderSim(){const s=S[st]; $('#cbSig').textContent=s[0]; $('#cbBody').innerHTML=s[1]; $('#rdSig').textContent=s[2]; $('#rdBody').innerHTML=s[3];
+  steps.forEach((el,i)=>{el.classList.toggle('on',i===st-1); el.classList.toggle('done',i<st-1);});
+  $('#simNext').disabled=st>=S.length-1; $('#simNext').textContent=st===0?'Start →':'Next step →';}
+document.querySelectorAll('.ph-body').forEach(el=>{el.style.height='100%';});
+function simNext(){if(st<S.length-1){st++;renderSim();}}
+$('#simNext').onclick=simNext; $('#simReset').onclick=()=>{st=0;renderSim();}; renderSim();
+// ---- live data from the running demo
+async function poll(){try{const d=await fetch('/api/status',{cache:'no-store'}).then(r=>r.json()); const a=d.aom||{}, l=d.load||{}, m=d.metrics||{}, reg=(a.registration||{}).state;
+  const ok=a.configured&&a.health&&a.health.status==='ok';
+  $('#health').textContent=ok?'AOM: connected'+(reg==='registered'?' · registered':''):(a.configured?'AOM: connecting…':'AOM: not configured');
+  $('#health').className='pill '+(ok?'ok':(a.configured?'warn':'bad'));
+  if(a.dashboard_url){$('#aomLink').href=a.dashboard_url;} else {$('#aomLink').style.display='none';}
+  const turns=m.assistant_turns||0, llmCalls=m.llm_calls||0, llmHits=m.llm_hits||0, ctxHits=m.context_hits||0;
+  const onDevice=Math.max(0, turns-llmCalls-ctxHits-(m.restricted_turns||0));   // answered without any model call (offline / local)
+  const ba=m.by_area||{}; for(const k of ['support','commerce','sales','workplace']){$('#a_'+k).textContent=(ba[k]||0).toLocaleString();}
+  $('#a_gate').textContent=(m.restricted_turns||0)+' refused by the audience gate (not team members)';
+  const avoided=llmHits+ctxHits+onDevice;
+  $('#m_turns').textContent=turns.toLocaleString(); $('#m_turnsd').textContent='since '+(m.since||'').slice(0,16).replace('T',' ')+' UTC · export '+(d.export_date||'…');
+  $('#m_llm').textContent=m.llm_hit_rate!=null?Math.round(m.llm_hit_rate)+'%':'-'; $('#m_llmd').textContent=llmHits+' of '+llmCalls+' model calls answered from AOM\'s LLM Cache';
+  $('#m_ctx').textContent=m.context_hit_rate!=null?Math.round(m.context_hit_rate)+'%':'-'; $('#m_ctxd').textContent=ctxHits+' of '+((m.context_hits||0)+(m.context_misses||0))+' personal questions reused cached context';
+  $('#m_saved').textContent=avoided.toLocaleString()+(avoided?' ≈ $'+(avoided*0.008).toFixed(2):''); $('#m_savedd').textContent='full model calls avoided: cache hits plus answers served on the phone';
+  const apps=Object.values(a.rag_apps||{}); const live=apps.filter(x=>['registered','updated'].includes(x.state)).length;
+  const ragTxt=apps.length?(live+' of '+apps.length+' RAG apps registered'):'RAG apps not registered';
+  const by=l.by_audience||{};
+  $('#liveLine').textContent=`${l.state==='loaded'?'Loaded':'Loading'} export ${d.export_date||'…'}${l.rows?' ('+(by.customer||0).toLocaleString()+' customers, '+(by.lead||0).toLocaleString()+' prospects, '+(by.employee||0).toLocaleString()+' team members)':''} · ${(m.requests||0)} actions processed${a.configured?' through AOM':''} · ${ragTxt}.`;
+}catch(e){$('#health').textContent='Demo backend: offline'; $('#health').className='pill bad'; $('#liveLine').textContent="The demo backend isn't answering yet.";}}
+// ---- company-wide chatbot workload (POST /api/demo/workload)
+const pct=v=>v==null?'-':Math.round(v)+'%';
+function renderWl(w){ if(!w||!w.state||w.state==='idle'){return;}
+  const t=w.total||{}, running=w.state==='running';
+  $('#wlStats').style.display=''; $('#wlStop').style.display=running?'':'none'; $('#wlRun').disabled=running;
+  $('#wl_turns').textContent=(w.done_turns||0)+(running?' / '+w.total_turns:''); $('#wl_turnsd').textContent=(w.done_users||0)+' of '+(w.total_users||0)+' people · '+((w.groups_covered||[]).length)+' of '+(w.group_count||12)+' groups'+(t.restricted?' · '+t.restricted+' gated':'');
+  $('#wl_llm').textContent=pct(t.llm_hit_rate); $('#wl_llmd').textContent=(t.llm_exact_hit||0)+' exact + '+(t.llm_semantic_hit||0)+' semantic hits, '+(t.llm_miss||0)+' provider calls';
+  $('#wl_ctx').textContent=pct(t.context_hit_rate); $('#wl_ctxd').textContent=(t.context_hit||0)+' hits, '+(t.context_miss||0)+' contexts built';
+  $('#wl_tok').textContent=(t.tokens_saved||0).toLocaleString(); $('#wl_tokd').textContent='≈ $'+(t.cost_saved_usd||0).toFixed(4)+' at list price'+(t.errors?' · '+t.errors+' errors':'');
+  $('#wlRun24').disabled=running;
+  const dh=(w.params||{}).duration_hours;
+  $('#wlLine').textContent=running?('Running - '+(w.done_turns||0)+' of '+w.total_turns+' turns…'+(dh?' paced over '+dh+' h (day/night curve), ends '+new Date(w.ends_at).toLocaleString()+'; '+(w.elapsed_hours||0)+' h elapsed':'')):('Run '+w.run_id+' '+w.state+' in '+w.seconds+'s. Open AOM → LLM Cache and Context Cache to see it.');}
+async function pollWl(){try{const w=await fetch('/api/demo/workload',{cache:'no-store'}).then(r=>r.json()); renderWl(w); if(w.state==='running'){setTimeout(pollWl,(w.params||{}).duration_hours?10000:1500);}}catch(e){}}
+$('#wlRun').onclick=async()=>{ $('#wlRun').disabled=true; $('#wlLine').textContent='Starting…';
+  const g=+$('#wlUsers').value||3, c=+$('#wlConc').value||4;
+  const r=await fetch('/api/demo/workload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({users_per_group:g,turns_per_user:6,concurrency:c})});
+  if(!r.ok){$('#wlLine').textContent='Could not start: '+(await r.text()).slice(0,200); $('#wlRun').disabled=false; return;}
+  pollWl();};
+$('#wlRun24').onclick=async()=>{ if(!confirm('Run the company workload for 24 hours? 300 people per group (up to 3,600 sessions, ~21,600 turns), 4 concurrent, paced to a day/night traffic curve. The backend must stay up for the whole run.')) return;
+  $('#wlRun24').disabled=true; $('#wlRun').disabled=true; $('#wlLine').textContent='Starting 24-hour run…';
+  const r=await fetch('/api/demo/workload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({users_per_group:300,turns_per_user:6,concurrency:4,duration_hours:24})});
+  if(!r.ok){$('#wlLine').textContent='Could not start: '+(await r.text()).slice(0,200); $('#wlRun24').disabled=false; $('#wlRun').disabled=false; return;}
+  pollWl();};
+$('#wlStop').onclick=async()=>{await fetch('/api/demo/workload',{method:'DELETE'}); pollWl();};
+function wlEstimate(){const g=+$('#wlUsers').value||0, c=+$('#wlConc').value||1; const turns=g*12*6; const secs=Math.round(turns*1.2/c); $('#wlEst').textContent=g?`≈ ${turns.toLocaleString()} turns · ~${secs<120?secs+' s':Math.round(secs/60)+' min'}`:'';}
+$('#wlUsers').oninput=wlEstimate; $('#wlConc').oninput=wlEstimate; wlEstimate();
+$('#rsRun').onclick=async()=>{ if(!confirm('Reset the demo? Personas go back to today\'s export, their AOM memories are deleted and Harborline\'s AOM cache namespaces are purged.')) return;
+  $('#rsRun').disabled=true; $('#wlLine').textContent='Resetting…';
+  const r=await fetch('/api/demo/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  const d=await r.json().catch(()=>({})); $('#rsRun').disabled=false;
+  if(!r.ok){$('#wlLine').textContent='Reset failed: '+(d.detail||r.status); return;}
+  const s=d.summary||{}; $('#wlStats').style.display='none';
+  $('#wlLine').textContent='Reset done: '+s.users+' people back to export '+d.export_date+', '+s.requests_removed+' requests removed, '+s.memories_deleted+' AOM memories deleted. Reload the app.'; poll();};
+pollWl();
+poll(); setInterval(poll,10000);
+</script>
+</body></html>
