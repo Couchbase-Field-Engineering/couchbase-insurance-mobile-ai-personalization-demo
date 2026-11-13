@@ -13,7 +13,7 @@ is the workload.
     # the deployment on mother (backend :8204, AOM dashboard :3111)
     python scripts/run_chatbot_workload.py
     # bigger / faster / a few groups only
-    python scripts/run_chatbot_workload.py --users-per-group 6 --turns 8 --concurrency 8 --groups CUS-NE,LEAD-SMB,EMP-TECH
+    python scripts/run_chatbot_workload.py --users-per-group 6 --turns 8 --concurrency 8 --groups POL-NE,MEM-PET,OD-TRAVEL
     # local docker compose
     python scripts/run_chatbot_workload.py --backend http://localhost:8204 --aom https://localhost:8090
 

@@ -19,8 +19,8 @@ const AuthContext = createContext<Ctx>({
 });
 
 /**
- * Sign-in = account number + last name (a customer number, a prospect's
- * reference or a member number). The backend answers with an app token
+ * Sign-in = account number + last name (a policy number, a member number
+ * or an on-demand account). The backend answers with an app token
  * and a Sync Gateway session for this person; the session is kept in the
  * Keychain so someone who opens the app offline lands straight on their
  * Couchbase Lite data.

@@ -6,11 +6,10 @@ import { useAuth } from '@/src/session/AuthContext';
 import { theme } from '@/src/theme';
 import { Button, Card, Field, Pill, SectionTitle, SyncBadge } from '@/src/ui/components';
 
-const AUDIENCE: Record<string, string> = { customer: 'Customer', lead: 'Business prospect', employee: 'Team member' };
-const SOURCE: Record<string, string> = { customer: 'CDP + commerce platform', lead: 'CRM', employee: 'HRIS + ITSM' };
+const AUDIENCE: Record<string, string> = { policyholder: 'Policyholder', member: 'Health & pet member', ondemand: 'On-demand customer' };
+const SOURCE = 'Policy administration, claims and billing';
 const SCORE_LABEL: Record<string, string> = {
-  cart_recovery_propensity: 'Cart recovery', upsell_propensity: 'Upsell', churn_risk: 'Churn risk', price_sensitivity: 'Price sensitivity',
-  lead_score: 'Lead score', fit: 'Fit',
+  renewal_propensity: 'Renewal propensity', churn_risk: 'Churn risk', cross_sell_propensity: 'Cross-sell propensity', claim_risk: 'Claim risk',
 };
 
 export default function Profile() {
@@ -36,9 +35,9 @@ export default function Profile() {
           </View>
           <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
             <Pill label={AUDIENCE[p.audience]} tone="ink" />
-            {p.loyalty ? <Pill label={`${p.loyalty.tier} · ${p.loyalty.points.toLocaleString('en-US')} points`} tone="orange" icon="star" /> : null}
-            {p.company ? <Pill label={`${p.lead?.role} · ${p.company.name}`} tone="neutral" /> : null}
-            {p.employment ? <Pill label={`${p.employment.title} · ${p.employment.department}`} tone="neutral" /> : null}
+            {(p.policies ?? []).map((x) => <Pill key={x.policy_id} label={x.product.replace('Harborline ', '')} tone="neutral" />)}
+            {p.telematics?.enrolled ? <Pill label={`DriveWell ${p.telematics.score ?? ''}`} tone="orange" icon="speedometer" /> : null}
+            {p.history?.customer_since ? <Pill label={`Since ${p.history.customer_since.slice(0, 4)}`} tone="neutral" /> : null}
           </View>
         </Card>
       ) : null}
@@ -47,12 +46,13 @@ export default function Profile() {
         <>
           <SectionTitle title="How Harborline knows you" />
           <Card style={{ padding: 16, gap: 8 }}>
-            <Field icon="analytics-outline" label="Source" value={`${SOURCE[p.audience]} · nightly export ${p.export_date}`} />
+            <Field icon="analytics-outline" label="Source" value={`${SOURCE} · nightly export ${p.export_date}`} />
             <Field icon="git-branch-outline" label="Scores" value={String(s?.model_version)} />
             {p.segments?.length ? <Field icon="layers-outline" label="Segments" value={p.segments.map((a) => a.name).join(' · ')} /> : null}
             <Field icon="people-circle-outline" label="Segment" value={String(s?.segment)} />
             <Field icon="navigate-outline" label="Next best action" value={String(s?.next_best_action).replace(/_/g, ' ')} />
-            <Field icon="heart-outline" label="Interests" value={p.preferences.interests.join(', ')} />
+            {Array.isArray(s?.recommended_products) && s.recommended_products.length ? <Field icon="heart-outline" label="Might also need" value={s.recommended_products.join(', ')} /> : null}
+            <Field icon="home-outline" label="Address" value={p.address ?? p.home_city} />
             {scores.map(([k, label]) => {
               const v = Number(s?.[k] ?? 0);
               return (
@@ -80,15 +80,15 @@ export default function Profile() {
         <Field icon="time-outline" label="Last sync" value={sync.lastSyncAt ? new Date(sync.lastSyncAt).toLocaleTimeString() : '—'} />
         <Field icon="cloud-upload-outline" label="Waiting to send" value={String(sync.pendingPush)} />
         <Text style={styles.tiny}>
-          {snap.handbook
-            ? 'The Team Handbook document is on this phone because your Sync Gateway user has the employees channel.'
-            : 'No Team Handbook on this phone: your Sync Gateway user has no employees channel, so it is never replicated here.'}
+          {snap.memberGuide
+            ? 'The Member Care Guide document is on this phone because your Sync Gateway user has the members channel.'
+            : 'No Member Care Guide on this phone: your Sync Gateway user has no members channel, so it is never replicated here.'}
         </Text>
         {sync.detail ? <Text style={[styles.tiny, { color: theme.color.danger }]}>{sync.detail}</Text> : null}
         <View style={styles.switchRow}>
           <View style={{ flex: 1 }}>
             <Text style={{ fontWeight: '700', color: theme.color.text }}>Offline mode</Text>
-            <Text style={styles.meta}>Pause replication to demo offline: browse, start a return, sign a form and ask Harborline from Couchbase Lite. Requests queue and send when you switch back.</Text>
+            <Text style={styles.meta}>Pause replication to demo offline: show an ID card, file a claim with photos, request a tow and ask Harborline from Couchbase Lite. Requests queue and send when you switch back.</Text>
           </View>
           <Switch value={offline} onValueChange={setOffline} trackColor={{ true: theme.color.red, false: theme.color.border }} thumbColor={theme.color.surface} />
         </View>
@@ -97,9 +97,9 @@ export default function Profile() {
       <SectionTitle title="Agent Operations Manager" />
       <Card style={{ padding: 16, gap: 8 }}>
         <Text style={styles.meta}>
-          Everything you confirm here becomes a request that an agent runs through Couchbase AOM: RBAC and tool scope, human approval for goodwill
-          credits and privileged access, a trace and an audit entry. Returns run as the Returns Agent, with Agent Memory. Answers use AOM's
-          Knowledge Base, Context Cache and LLM Cache.
+          Everything you confirm here becomes a request that a specialist agent runs through Couchbase AOM - Claims, Roadside, Billing, DriveWell,
+          Wellness or Coverage - each limited to its own tools, with Agent Memory, a trace and an audit entry. Late-fee waivers wait for a billing
+          supervisor and coverage changes for an underwriter. Answers use AOM's Knowledge Base, Context Cache and LLM Cache.
         </Text>
         <Field icon="link-outline" label="Backend" value={API_URL} />
         <Field icon="finger-print-outline" label="User ID" value={session?.user_id ?? '—'} />

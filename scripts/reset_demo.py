@@ -72,7 +72,7 @@ def main():
         print(f"  {g['user_id']}: profile {g['profile']}, {g['requests']} requests, docs {g['docs'] or '-'}, "
               f"{g['memories']} memories{err}")
     if res.get("inventory_restored"):
-        print("  Stock and consultation slots restored")
+        print("  Telehealth appointments restored")
     caches = res.get("aom_caches") or {}
     if "skipped" in caches:
         print(f"  AOM caches: skipped ({caches['skipped']})")

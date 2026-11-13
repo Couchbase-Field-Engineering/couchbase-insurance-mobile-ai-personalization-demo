@@ -8,28 +8,49 @@ import type { Area, Audience, ChatMessage } from '@/src/types';
 import { AREA_UI, AreaTag, Pill, SyncBadge, Wordmark, type Tone } from '@/src/ui/components';
 import { openAction } from '@/src/ui/nav';
 
-/** What each audience can ask, by area - the four jobs of a company-wide chatbot. */
+/** What each kind of customer can ask, by area - the eight jobs of an insurance app. */
 const PROMPTS: Record<Audience, Partial<Record<Area, string[]>>> = {
-  customer: {
-    commerce: ['Where is my order?', 'Can I return the Lumen chair?', 'Is the offer on my cart still valid?'],
-    support: ['What are your store hours?', 'How long does delivery take?', 'What is your return policy?', 'Do you price match?',
-      "My keyboard arrived with a broken key and I'm really disappointed"],
-    sales: ['Can you recommend a monitor for me?', 'What is Harborline for Business?'],
-    workplace: ['How do I reset my VPN password?'],
+  policyholder: {
+    documents: ['Show my insurance card', 'I need proof of insurance for my lender', 'Where is my declarations page?'],
+    claims: ["What's the status of my claim?", 'How do I file a claim?', 'Someone hit my car in a car park', 'What does my deductible mean?'],
+    roadside: ['I have a flat tire', 'My battery died - can you send someone?', "I've been in an accident", 'How many roadside calls do I get?'],
+    billing: ['When is my next payment due?', 'Why did my renewal go up?', 'Turn on AutoPay', 'Can I pay my premium in full?'],
+    telematics: ["What's my driving score?", 'How much has DriveWell saved me?', 'How does pay-per-mile work?'],
+    support: ['I moved - update my address', 'Add a driver to my policy', 'Can I talk to a licensed agent?'],
+    coverage: ["I'm borrowing a friend's car this weekend", 'Do you cover rental cars?', 'I need cover for a trip'],
+    wellness: ['Can I book a telehealth visit?'],
   },
-  lead: {
-    sales: ['We need to furnish our office - where do I start?', 'Can I book a consultation this week?', 'Do you offer volume pricing?',
-      'Can you recommend a desk for me?'],
-    support: ['What are your store hours?', 'How long does delivery take?', 'What is your return policy?'],
-    workplace: ['What medical plans do employees get?'],
+  member: {
+    wellness: ['Can I see a doctor today?', 'How much of my deductible have I met?', "How do I get Biscuit's vet bill paid back?", 'Link my Apple Watch',
+      'How do telehealth visits work?'],
+    documents: ['Show my insurance card', 'I need my summary of benefits'],
+    billing: ['Is anything past due?', 'Can you waive my late fee?', 'Turn on AutoPay'],
+    roadside: ['I have a medical emergency while travelling', 'Can I get roadside help without an auto policy?'],
+    support: ['Change the email on my account', 'Can I talk to a licensed agent?'],
+    coverage: ['I need cover for a trip', 'Do you cover rental cars?'],
+    claims: ['How do I file a claim?'],
   },
-  employee: {
-    workplace: ['I forgot my password', "My laptop won't connect to the VPN", "What's left on my onboarding checklist?", 'Am I enrolled in benefits?',
-      'How many vacation days do I have?', 'I need access to the Sales Analytics workspace for my weekly reports', 'How do I reset my password?'],
-    support: ['What is your return policy?', 'What are your store hours?'],
+  ondemand: {
+    coverage: ["I'm borrowing a friend's car this weekend", 'Cover my trip to Lisbon', 'What does trip protection cover?', 'How fast does on-demand cover start?'],
+    roadside: ['I have a flat tire', 'My rental car broke down', 'I have an emergency while travelling'],
+    documents: ['Show my certificate of coverage', 'Is a digital ID card accepted as proof of insurance?'],
+    support: ['Can I talk to a licensed agent?', 'What does Harborline insure?'],
+    billing: ['How do I pay for on-demand cover?'],
+    wellness: ['Can I book a telehealth visit?'],
   },
 };
-const AREA_ORDER: Area[] = ['support', 'commerce', 'sales', 'workplace'];
+const AREA_ORDER: Area[] = ['documents', 'claims', 'roadside', 'billing', 'telematics', 'support', 'wellness', 'coverage'];
+const HOME: Record<Audience, Area> = { policyholder: 'claims', member: 'wellness', ondemand: 'coverage' };
+const INTRO: Record<Audience, string> = {
+  policyholder: 'I know your policies, your open claim, what is due and your DriveWell score - and I can send roadside help to where you are.',
+  member: 'I know your health and pet plans, your deductible, your telehealth visits and vet bills - plus everything about billing and documents.',
+  ondemand: "I can switch on cover by the day for a borrowed car, a rental or a trip, and send roadside or SOS help while it's active.",
+};
+const PLACEHOLDER: Record<Audience, string> = {
+  policyholder: 'Ask about claims, payments, roadside…',
+  member: 'Ask about telehealth, vet bills, your deductible…',
+  ondemand: 'Ask about cover for a car or a trip…',
+};
 
 function llmLabel(m: ChatMessage): { label: string; tone: Tone } | null {
   if (m.offline) return { label: 'Answered on device · Couchbase Lite', tone: 'warn' };
@@ -48,9 +69,9 @@ export default function Chat() {
   const insets = useSafeAreaInsets();
   const [text, setText] = useState('');
   const scroll = useRef<ScrollView>(null);
-  const audience: Audience = snap.profile?.audience ?? 'customer';
+  const audience: Audience = snap.profile?.audience ?? 'policyholder';
   const areas = AREA_ORDER.filter((a) => PROMPTS[audience][a]?.length);
-  const home: Area = audience === 'employee' ? 'workplace' : audience === 'lead' ? 'sales' : 'commerce';
+  const home = HOME[audience];
   const [area, setArea] = useState<Area>(home);
   useEffect(() => setArea(home), [home]);
   const firstLive = liveChat[0]?.at;
@@ -83,7 +104,7 @@ export default function Chat() {
           <Wordmark height={18} />
           <SyncBadge sync={sync} dark />
         </View>
-        <Text style={styles.subtitle}>One assistant for support, orders, sales, IT and HR · governed by Couchbase AOM</Text>
+        <Text style={styles.subtitle}>One assistant, seven agents: cards, claims, roadside, billing, DriveWell, wellness, cover · governed by Couchbase AOM</Text>
       </View>
 
       <ScrollView ref={scroll} style={{ flex: 1 }} contentContainerStyle={styles.list}>
@@ -91,18 +112,14 @@ export default function Chat() {
           <View style={styles.intro}>
             <Text style={styles.introTitle}>Hi{snap.profile ? ` ${snap.profile.first_name}` : ''}, what can I help with?</Text>
             <Text style={styles.introBody}>
-              {audience === 'employee'
-                ? 'I know your onboarding tasks, benefits, devices and tickets - and I can answer anything a customer would ask too.'
-                : audience === 'lead'
-                  ? "I can size a workspace package for your team, capture what you need for a quote and book a consultation."
-                  : 'I know your orders, your cart and what you can still return - plus store hours, delivery and pricing.'}
+              {INTRO[audience]}
             </Text>
             <View style={{ gap: 6, marginTop: 4 }}>
               {areas.map((a) => (
                 <View key={a} style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
                   <Ionicons name={AREA_UI[a].icon} size={14} color={theme.area[a]} />
                   <Text style={{ color: theme.color.body, fontSize: theme.type.sm, fontWeight: '600' }}>{AREA_UI[a].label}</Text>
-                  {a === 'workplace' && audience !== 'employee' ? <Text style={styles.tiny}>team members only - try it</Text> : null}
+                  {a === 'wellness' && audience !== 'member' ? <Text style={styles.tiny}>health & pet members only - try it</Text> : null}
                 </View>
               ))}
             </View>
@@ -136,7 +153,7 @@ export default function Chat() {
         <TextInput
           value={text}
           onChangeText={setText}
-          placeholder={audience === 'employee' ? 'Ask about IT, benefits, onboarding…' : audience === 'lead' ? 'Ask about workspaces, pricing…' : 'Ask about orders, returns, products…'}
+          placeholder={PLACEHOLDER[audience]}
           placeholderTextColor={theme.color.faint}
           style={styles.input}
           onSubmitEditing={() => send(text)}
@@ -162,12 +179,12 @@ function Bubble({ m }: { m: ChatMessage }) {
   }
   const llm = llmLabel(m);
   const ctx = m.context;
-  const kb = ctx?.knowledge === 'handbook' ? 'Team Handbook' : ctx?.knowledge === 'helpcenter' ? 'Help Center' : null;
+  const kb = ctx?.knowledge === 'helpcenter' ? 'Help Center' : ctx?.knowledge ? 'Member Care Guide' : null;
   return (
     <View style={[styles.bubble, styles.botBubble, m.restricted && styles.restricted]}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
         <AreaTag area={m.area} />
-        {m.restricted ? <Pill label="Audience gate" tone="ink" icon="lock-closed" /> : null}
+        {m.restricted ? <Pill label="Members only" tone="ink" icon="lock-closed" /> : null}
       </View>
       <Text style={{ color: theme.color.text, fontSize: theme.type.md, lineHeight: 21 }}>{m.text}</Text>
       {m.actions?.length ? (

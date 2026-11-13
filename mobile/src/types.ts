@@ -1,39 +1,112 @@
 /** Document shapes replicated from Couchbase (scope `ins`) into Couchbase Lite. */
 
-export type Audience = 'customer' | 'lead' | 'employee';
-export type Area = 'support' | 'commerce' | 'sales' | 'workplace';
+export type Audience = 'policyholder' | 'member' | 'ondemand';
+/** The eight things the app does. */
+export type Area = 'documents' | 'claims' | 'roadside' | 'billing' | 'telematics' | 'support' | 'wellness' | 'coverage';
+export type Line = 'auto' | 'home' | 'renters' | 'health' | 'pet';
 
-export type OrderItem = { sku: string; name: string; qty: number; price: number };
+export type PolicyDocument = { doc_id: string; type: string; title: string; issued: string; status: string; delivery?: string; pages?: number; recipient?: string };
+export type Vehicle = { vehicle_id: string; year: number; make: string; model: string; vin_last6: string; plate: string };
+export type Pet = { pet_id: string; name: string; species: string; breed: string; age: number };
 
-export type Order = {
-  order_id: string;
-  placed_at: string;
-  status: 'processing' | 'shipped' | 'out_for_delivery' | 'delivered' | 'cancelled';
-  items: OrderItem[];
-  subtotal_usd: number;
-  shipping_usd: number;
-  discount_usd?: number;
-  offer_code?: string | null;
-  total_usd: number;
-  carrier: string;
-  tracking_number: string | null;
-  eta: string | null;
-  delivery_window: string | null;
-  delivered_at: string | null;
-  ship_to_city: string;
+export type Billing = {
+  plan: 'monthly' | 'pay_in_full';
+  installment_usd: number;
+  next_due: string | null;
+  balance_due_usd: number;
+  late_fee_usd: number;
+  past_due: boolean;
+  autopay: boolean;
+  autopay_day: number | null;
+  method: { type: string; last4: string };
+};
+
+export type Renewal = { status: 'offered' | 'renewed' | string; offer_premium_usd: number; change_pct?: number; renews_on: string; discounts?: string[]; pay_plan?: string };
+
+export type Policy = {
+  policy_id: string;
+  line: Line;
+  product: string;
+  status: string;
+  effective: string;
+  expires: string;
+  premium_usd: number;
+  deductible_usd: number | null;
+  coverages: { name: string; limit: string }[];
+  billing: Billing;
+  documents: PolicyDocument[];
+  renewal: Renewal | null;
+  roadside?: boolean;
+  vehicles?: Vehicle[];
+  property?: { address: string; type: string };
+  plan_id?: string;
+  pets?: Pet[];
+  routine_care?: boolean;
+  usage?: { deductible_met_usd: number; paid_usd: number };
+  id_card?: { number: string; insured: string; valid_from: string; valid_to: string; naic?: string; group?: string; plan?: string; rx_bin?: string };
+};
+
+export type Claim = {
+  claim_id: string;
+  policy_id: string;
+  line: Line;
+  loss_type: string;
+  loss_date: string;
+  filed_at: string;
+  status: string;
+  description: string;
+  location?: string;
+  adjuster?: string;
+  deductible_usd?: number;
+  estimate_usd?: number | null;
+  payout_usd?: number | null;
+  drivable?: boolean;
+  evidence: { kind: string; count: number; at: string; note?: string }[];
   events: { at: string; text: string }[];
 };
 
-export type ReturnRecord = {
-  return_id: string; order_id: string; sku: string; name: string; reason: string; resolution: 'refund' | 'exchange';
-  status: string; created_at: string; label_code: string; refund_usd?: number; exchange_name?: string;
+export type Dispatch = {
+  dispatch_id: string; service: string; service_name: string; status: string; provider: string; eta_minutes: number;
+  location: { label: string; lat?: number; lon?: number }; vehicle?: string; requested_at: string; cost_usd?: number;
 };
 
-export type OnboardingTask = {
-  task_id: string; title: string; kind: 'form' | 'sign' | 'training'; due_date: string; status: 'pending' | 'complete'; completed_at: string | null;
+export type Trip = { trip_id: string; date: string; miles: number; minutes: number; hard_brakes: number; speeding: number; night: boolean; phone_use: number; score: number };
+
+export type Telematics = {
+  enrolled: boolean;
+  program?: 'safe-driver' | 'pay-per-mile';
+  vehicle_id?: string;
+  device?: string;
+  enrolled_at?: string;
+  score?: number | null;
+  factors?: Record<string, number>;
+  miles_month?: number;
+  miles_term?: number;
+  trips?: Trip[];
+  redeemed?: boolean;
 };
 
-export type Ticket = { ticket_id: string; category: string; summary: string; status: string; priority: string; opened_at: string; queue?: string };
+export type OnDemandCoverage = {
+  coverage_id: string; product: string; name: string; start: string; end: string; days: number; price_usd: number; status: string;
+  covers: string[]; vehicle?: string | null; destination?: string | null; roadside?: boolean;
+  certificate?: { doc_id: string; type: string; title: string; issued: string; status: string };
+};
+
+export type TripPlan = { destination: string; depart: string; return: string; trip_cost_usd?: number };
+export type DrivePlan = { kind: 'borrowed' | 'rental'; vehicle: string; start: string; days: number };
+export type Plans = { trip?: TripPlan; drive?: DrivePlan };
+
+export type VetBill = {
+  bill_id: string; pet_id: string; pet_name: string; amount_usd: number; clinic: string; visit_date: string; reason: string; submitted_at: string;
+  status: string; eligible_usd?: number; deductible_applied_usd?: number; reimbursement_usd?: number; routine?: boolean; pct?: number; pays_by?: string | null;
+};
+
+export type Wellness = {
+  deductible?: { individual_usd: number; met_usd: number; oop_max_usd: number; oop_met_usd: number; resets: string };
+  telehealth?: { visits_used: number; upcoming: { date: string; time: string; type_name: string; provider: string; reason?: string } | null };
+  wearable?: { linked: boolean; device?: string; points?: number; steps_7d_avg?: number; reward_usd?: number; linked_at?: string };
+  vet_bills?: VetBill[];
+};
 
 export type Profile = {
   type: 'profile';
@@ -47,52 +120,38 @@ export type Profile = {
   last_name: string;
   email: string | null;
   phone?: string | null;
+  address?: string | null;
   home_city: string;
   region: string;
-  preferences: { interests: string[]; communication_channel: string; preferred_store: string | null };
+  preferences: { communication_channel: string; paperless: boolean; language: string };
   segments?: { id: string; name: string; status?: string }[];
   ml_scores: Record<string, number | string | string[] | null> & { model_version: string; segment: string; next_best_action: string };
-  identity?: Record<string, string>;
-  // customers
-  loyalty?: { program: string; tier: string; points: number; member_since: string };
-  orders?: Order[];
-  cart?: { updated_at: string; items: OrderItem[]; subtotal_usd: number; abandoned_days: number; offer: { code: string; pct_off: number; expires: string } | null } | null;
-  returns?: ReturnRecord[];
-  credits?: { credit_id: string; amount_usd: number; reason: string; issued_at: string }[];
-  history?: { lifetime_value_usd: number; orders_count: number; avg_order_usd: number; returns_count: number };
-  // prospects
-  company?: { name: string; industry: string; employees: number; size_band: string; city: string };
-  lead?: { source: string; status: string; score: number; seats: number | null; budget_band: string | null; timeline: string | null; interest: string[]; owner: string | null; role: string };
-  consultation?: { date: string; time: string; topic: string; channel: string; rep: string } | null;
-  // team members
-  employment?: { title: string; department: string; manager: string; location: string; start_date: string; tenure_days: number; employment_type: string };
-  it?: {
-    devices: { asset_tag: string; type: string; model: string; os: string }[];
-    systems_access: string[];
-    open_tickets: Ticket[];
-    password_expires_in_days: number;
-    mfa_enrolled: boolean;
-  };
-  hr?: {
-    benefits: { enrolled: boolean; medical: string | null; dental: string | null; vision: string | null; k401_pct: number; enrollment_deadline: string | null };
-    pto: { balance_days: number; used_days: number; accrual_per_month?: number; requests: { start_date: string; end_date: string; days: number; status: string }[] };
-    pay: { frequency: string; next_pay_date: string };
-  };
-  onboarding?: { status: 'in_progress' | 'complete'; tasks: OnboardingTask[] };
+  policies: Policy[];
+  claims: Claim[];
+  payments: { payment_id: string; policy_id: string; amount_usd: number; method: string; at: string; for?: string }[];
+  roadside: { uses_this_term: number; dispatches: Dispatch[]; last_location?: { label: string; lat: number; lon: number } };
+  emergencies?: { sos_id: string; kind: string; status: string; at: string; callback_minutes?: number }[];
+  telematics: Telematics;
+  on_demand: { coverages: OnDemandCoverage[]; plans: Plans };
+  support?: { requests: { request_id: string; kind?: string; topic?: string; channel?: string; status: string; agent?: string; wait_minutes?: number; details?: string }[] };
+  history?: { customer_since: string; claims_count: number };
+  /** Health and pet members only. */
+  wellness?: Wellness;
 };
 
 export type Cta = { label: string; screen?: string; tool?: string; ask?: string; args?: Record<string, unknown> };
 
-export type ReturnOption = {
-  order_id: string; sku: string; name: string; price: number; delivered_at: string; days_left: number; window_days: number;
-  exchange_options: { sku: string; name: string; price: number; in_stock: number }[];
-};
-
 export type SlotDay = { date: string; slots: { time: string; open: number }[] };
+
+export type OnDemandProduct = {
+  id: string; name: string; unit: string; price_per_day: number; pct_of_trip_cost?: number; min_usd: number; max_days: number;
+  needs: string[]; roadside: boolean; blurb: string; covers: string[];
+  quote?: { product: string; name: string; days: number; price_usd: number; covers: string[] };
+};
 
 export type FeedCard = {
   card_id: string;
-  kind: 'order' | 'return' | 'cart' | 'product' | 'consult' | 'lead' | 'onboarding' | 'benefits' | 'ticket' | 'it' | 'timeoff' | 'reward';
+  kind: 'payment' | 'renewal' | 'claim' | 'idcard' | 'drive' | 'roadside' | 'telehealth' | 'deductible' | 'vetbill' | 'wearable' | 'coverage';
   palette: string;
   area: Area;
   title: string;
@@ -102,11 +161,10 @@ export type FeedCard = {
   score: number;
   rank: number;
   cta: Cta;
-  options?: ReturnOption[];   // return card: everything the Return screen needs, so it works offline
-  reasons?: string[];
-  slots?: SlotDay[];          // consult card: open slots for the Consultation screen
-  topics?: string[];
-  channels?: string[];
+  slots?: SlotDay[];                       // telehealth card: open appointments, so booking works offline
+  types?: { id: string; name: string }[];
+  products?: OnDemandProduct[];            // coverage cards: every product with a quote for this person's plans
+  plans?: Plans;
 };
 
 export type FeedDoc = {
@@ -116,6 +174,7 @@ export type FeedDoc = {
   model_version: string;
   segment: string;
   export_date: string;
+  today?: string;
   generated_at: string;
 };
 
@@ -126,10 +185,9 @@ export type ActivityItem = {
   status: string;
   date?: string;
   time?: string;
-  charge_usd?: number;
+  charge_usd?: number | null;
   amount_usd?: number;
-  refund_usd?: number;
-  label_code?: string;
+  refund_usd?: number | null;
   created_at: string;
 };
 
@@ -148,8 +206,8 @@ export type ActionRequest = {
   charge_usd?: number;
   governed?: boolean;
   trace_id?: string | null;
-  /** AOM agent identity that ran it: the assistant, or the Returns Agent for returns and credits. */
-  agent?: 'insurance-assistant' | 'insurance-returns-agent' | string;
+  /** AOM agent identity that ran it: the assistant, or the specialist that owns the use case. */
+  agent?: string;
   memories_recalled?: number;
   remembered?: boolean;
   approval_id?: string | null;
@@ -168,7 +226,7 @@ export type ChatMessage = {
   restricted?: boolean;
   context?: {
     status: string | null; latency_ms: number; kb_mode?: string; build_ms?: number; rag_app?: string; knowledge?: string; source?: string;
-    // the system-of-record round trip (CDP, CRM or HRIS) made while building this context
+    // the system-of-record round trip (policy administration, claims, billing) made while building this context
     sor?: { system: string; label: string; mode: string; latency_ms: number; segments: string[] } | null;
   };
   llm?: { status: string; namespace?: string | null; similarity?: number | null; latency_ms?: number | null; stub?: boolean; composed_locally?: boolean };
@@ -195,36 +253,45 @@ export type ContextDoc = {
 
 export type Faq = { q: string; a: string; keywords: string[]; section?: string; intent?: string };
 
-export type Product = { sku: string; name: string; category: string; price: number; tags: string[]; blurb: string };
-
 /** `catalog::v1` - on the `catalog` channel, so every signed-in phone has it. */
 export type Catalog = {
   type: 'catalog';
   export_date: string;
-  company: { name: string; support_phone: string; support_hours: string; business_brand: string; loyalty_program: string };
-  stores: { id: string; name: string; city: string; region: string; hours: string }[];
-  products: Product[];
-  bundles: { code: string; name: string; seats: number[]; price_per_seat: number; includes: string[]; blurb: string }[];
-  delivery_windows: string[];
-  return_reasons: string[];
-  consult_topics: string[];
-  consult_times: string[];
-  consult_channels: string[];
-  budget_bands: string[];
-  timelines: string[];
+  company: { name: string; support_phone: string; claims_phone: string; roadside_phone: string; support_hours: string; wellness_brand: string; telematics_program: string };
+  lines: Record<string, { name: string; product: string; icon: string; term_months: number }>;
+  doc_types: { id: string; name: string; lines: string[]; instant: boolean }[];
+  doc_delivery: string[];
+  loss_types: Record<string, { id: string; name: string }[]>;
+  claim_steps: string[];
+  claim_step_label: Record<string, string>;
+  evidence_kinds: string[];
+  roadside_services: { id: string; name: string; eta_min: number; detail: string }[];
+  roadside_payg_usd: number;
+  sos_kinds: { id: string; name: string; detail: string }[];
+  pay_plans: Record<string, string>;
+  late_fee_usd: number;
+  telematics_programs: Record<string, { name: string; blurb: string; enroll_discount_pct?: number; max_discount_pct?: number; base_usd_month?: number; cents_per_mile?: number }>;
+  policy_changes: { id: string; name: string; lines: string[]; approval: boolean }[];
+  agent_topics: string[];
+  agent_channels: string[];
+  on_demand: OnDemandProduct[];
+  destinations: string[];
   faq: Faq[];
 };
 
-/** `handbook::v1` - on the `employees` channel: only a team member's phone ever receives it. */
-export type Handbook = {
-  type: 'handbook';
+/** `wellness::v1` - on the `members` channel: only a health or pet member's phone ever receives it. */
+export type MemberGuide = {
+  type: 'member_guide';
   export_date: string;
-  it_categories: { id: string; name: string; queue: string; sla_hours: number }[];
-  it_priorities: string[];
-  systems: { id: string; name: string; approval: boolean; default: boolean }[];
-  benefit_plans: Record<'medical' | 'dental' | 'vision', { id: string; name: string; employee_cost_per_paycheck: number; deductible?: number; blurb: string }[]>;
-  onboarding_tasks: { task_id: string; title: string; kind: string; due_day: number; detail: string }[];
-  k401_match_pct: number;
+  health_plans: { id: string; name: string; deductible: number; oop_max: number; telehealth_copay: number; blurb: string }[];
+  pet_plans: { id: string; name: string; reimbursement_pct: number; annual_deductible: number; annual_limit: number; blurb: string }[];
+  telehealth_types: { id: string; name: string }[];
+  telehealth_times: string[];
+  vet_visit_reasons: string[];
+  wearables: string[];
+  step_goal: number;
+  points_per_goal_day: number;
+  points_per_dollar: number;
   faq: Faq[];
 };
 

@@ -4,39 +4,43 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '@/src/data/DataContext';
 import { theme } from '@/src/theme';
 import type { FeedCard, Profile } from '@/src/types';
-import { AreaTag, Card, daysBetween, Empty, Eyebrow, fmtDate, GradientArt, Pill, SectionTitle, STATUS_UI, SyncBadge, Wordmark } from '@/src/ui/components';
+import { AreaTag, Card, daysBetween, Empty, Eyebrow, fmtDate, GradientArt, money, Pill, SectionTitle, STATUS_UI, SyncBadge, Wordmark } from '@/src/ui/components';
+import { activeOnDemand, activePolicies, amountDue, policySubject } from '@/src/insurance';
 import { KIND_ICON, KIND_LABEL, openAction } from '@/src/ui/nav';
+
+const AUDIENCE_LABEL = { policyholder: 'Policyholder', member: 'Health & pet member', ondemand: 'On-demand customer' } as const;
 
 /** The one number that matters most to this person today. */
 function headline(p: Profile, today: string): { num: string; label: string; title: string; lines: string[] } {
-  if (p.audience === 'customer') {
-    const open = (p.orders ?? []).find((o) => ['processing', 'shipped', 'out_for_delivery'].includes(o.status));
-    if (open?.eta) {
-      return {
-        num: String(Math.max(0, daysBetween(open.eta, today))), label: 'DAYS TO DELIVERY', title: open.items[0].name,
-        lines: [`Order ${open.order_id} · ${open.status.replace(/_/g, ' ')}`, `${fmtDate(open.eta)}${open.delivery_window ? ` · ${open.delivery_window}` : ''}`],
-      };
-    }
-    return { num: String(p.loyalty?.points ?? 0), label: 'REWARDS POINTS', title: `${p.loyalty?.tier} member`, lines: [p.loyalty?.program ?? ''] };
+  const pols = activePolicies(p);
+  const live = (p.roadside?.dispatches ?? []).find((d) => ['dispatched', 'en_route', 'on_scene'].includes(d.status));
+  if (live) return { num: String(live.eta_minutes), label: 'MINUTES AWAY', title: `${live.service_name} on the way`, lines: [live.provider, live.location.label] };
+  const owing = pols.filter((x) => amountDue(x) > 0).sort((a, b) => ((a.billing.next_due ?? '') < (b.billing.next_due ?? '') ? -1 : 1))[0];
+  if (owing?.billing.past_due) {
+    return { num: money(amountDue(owing)), label: 'PAST DUE', title: `${owing.product} · ${policySubject(owing)}`, lines: [owing.policy_id, `Was due ${fmtDate(owing.billing.next_due)}`] };
   }
-  if (p.audience === 'lead') {
-    const c = p.consultation;
-    return c
-      ? { num: String(Math.max(0, daysBetween(c.date, today))), label: 'DAYS TO CONSULTATION', title: c.topic, lines: [`${fmtDate(c.date)} at ${c.time} · ${c.channel}`, `with ${c.rep}`] }
-      : { num: String(p.lead?.seats ?? p.company?.employees ?? 0), label: p.lead?.seats ? 'SEATS TO FURNISH' : 'PEOPLE ON YOUR TEAM', title: p.company?.name ?? '', lines: [`${p.company?.industry} · ${p.company?.city}`, `Lead status: ${String(p.lead?.status).replace(/_/g, ' ')}`] };
+  const claim = (p.claims ?? []).find((c) => !['paid', 'closed', 'denied'].includes(c.status));
+  if (claim) {
+    return { num: String(Math.max(0, daysBetween(today, claim.filed_at))), label: 'DAYS SINCE YOU FILED', title: `Claim ${claim.claim_id}`,
+      lines: [claim.status.replace(/_/g, ' '), claim.adjuster ? `Adjuster: ${claim.adjuster}` : ''].filter(Boolean) };
   }
-  const pending = (p.onboarding?.tasks ?? []).filter((t) => t.status !== 'complete');
-  if (pending.length) {
-    return { num: String(pending.length), label: 'ONBOARDING TASKS LEFT', title: `Day ${daysBetween(today, p.employment?.start_date ?? today) + 1} at Harborline`, lines: [`${p.employment?.title} · ${p.employment?.department}`, `Reporting to ${p.employment?.manager}`] };
+  const cover = activeOnDemand(p, today)[0];
+  if (cover) return { num: String(Math.max(0, daysBetween(cover.end, today)) + 1), label: 'DAYS OF COVER LEFT', title: cover.name, lines: [cover.vehicle ?? cover.destination ?? '', `Until ${fmtDate(cover.end)}`].filter(Boolean) };
+  const plan = p.on_demand?.plans?.drive ?? null;
+  if (p.audience === 'ondemand' && plan) {
+    return { num: String(Math.max(0, daysBetween(plan.start, today))), label: plan.kind === 'rental' ? 'DAYS TO YOUR RENTAL' : 'DAYS TO BORROWING', title: plan.vehicle, lines: [`${plan.days} days from ${fmtDate(plan.start)}`, 'Not covered yet'] };
   }
-  return { num: String(p.hr?.pto.balance_days ?? 0), label: 'DAYS OF TIME OFF', title: p.employment?.title ?? '', lines: [`${p.employment?.department} · ${p.employment?.location}`] };
+  if (owing) return { num: String(Math.max(0, daysBetween(owing.billing.next_due ?? today, today))), label: 'DAYS TO NEXT PAYMENT', title: `${money(amountDue(owing))} · ${owing.product}`, lines: [owing.policy_id, fmtDate(owing.billing.next_due)] };
+  const d = p.wellness?.deductible;
+  if (d) return { num: `${Math.round((d.met_usd / d.individual_usd) * 100)}%`, label: 'OF DEDUCTIBLE MET', title: `${money(d.met_usd)} of ${money(d.individual_usd)}`, lines: [`Resets ${fmtDate(d.resets)}`] };
+  return { num: String(pols.length), label: pols.length === 1 ? 'ACTIVE POLICY' : 'ACTIVE POLICIES', title: pols.map((x) => x.product.replace('Harborline ', '')).join(' + ') || 'On-demand cover', lines: [p.home_city] };
 }
 
 export default function ForYou() {
   const { snap, sync, refresh } = useData();
   const insets = useSafeAreaInsets();
   const p = snap.profile;
-  const today = p?.export_date ?? new Date().toISOString();
+  const today = (snap.feed?.today ?? p?.export_date ?? new Date().toISOString()).slice(0, 10);
   const cards = snap.feed?.cards ?? [];
   const recent = snap.requests.slice(0, 3);
   const hour = new Date().getHours();
@@ -64,9 +68,8 @@ export default function ForYou() {
               </View>
             </View>
             <View style={[styles.row, { marginTop: 14, justifyContent: 'flex-start', gap: 8, flexWrap: 'wrap' }]}>
-              {p.audience === 'customer' ? <Pill label={`${p.loyalty?.tier} · ${p.loyalty?.program}`} tone="dark" icon="star" /> : null}
-              {p.audience === 'lead' ? <Pill label={`${p.lead?.role} · ${p.company?.employees} people`} tone="dark" icon="briefcase-outline" /> : null}
-              {p.audience === 'employee' ? <Pill label={`${p.employment?.department}`} tone="dark" icon="id-card-outline" /> : null}
+              <Pill label={AUDIENCE_LABEL[p.audience]} tone="dark" icon="shield-checkmark" />
+              {p.telematics?.enrolled && p.telematics.score ? <Pill label={`DriveWell ${p.telematics.score}`} tone="dark" icon="speedometer" /> : null}
               <Pill label={p.home_city} tone="dark" icon="location-outline" />
             </View>
           </>
@@ -153,7 +156,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   greet: { color: theme.color.onDark, fontSize: theme.type.title, fontWeight: '600', fontFamily: theme.font.display, marginTop: 22, letterSpacing: -0.4 },
   countRow: { flexDirection: 'row', gap: 18, marginTop: 14, alignItems: 'center' },
-  countNum: { color: theme.color.red, fontSize: 56, fontWeight: '600', fontFamily: theme.font.display, lineHeight: 60, letterSpacing: -1.5 },
+  countNum: { color: theme.color.red, fontSize: 48, fontWeight: '600', fontFamily: theme.font.display, lineHeight: 60, letterSpacing: -1.5 },
   countLbl: { color: theme.color.onDarkMuted, fontSize: 10, fontWeight: '700', letterSpacing: 1.6 },
   heroTitle: { color: theme.color.onDark, fontSize: theme.type.lg, fontWeight: '600', fontFamily: theme.font.display },
   heroLine: { color: theme.color.onDarkMuted, fontSize: theme.type.sm },

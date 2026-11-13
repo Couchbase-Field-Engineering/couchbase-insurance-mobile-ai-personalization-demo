@@ -7,7 +7,7 @@
  * (SessionAuthenticator, same pattern as mobile_field_service). The person's
  * Sync Gateway user only has the `user:<id>` and `catalog` channels - plus
  * `members` for a health or pet plan member - so the phone only ever holds this
- * person's data, and the Team Handbook never lands on a customer's phone.
+ * person's data, and the Member Care Guide never lands on a phone without a health or pet plan.
  *
  * Reads go straight to the local database - every screen renders offline.
  * Writes are only ever new `requests` documents, which the replicator pushes

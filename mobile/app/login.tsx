@@ -10,13 +10,13 @@ import { theme } from '@/src/theme';
 import { AREA_UI, Button, Eyebrow, Wordmark, type IconName } from '@/src/ui/components';
 
 const FALLBACK: Persona[] = [
-  { user_id: 'C00000101', name: 'Maya Chen', last_name: 'Chen', account_id: '5510101', audience: 'customer', audience_label: 'Customer', headline: 'Gold member · Brooklyn, NY', blurb: 'Customer support and e-commerce: order tracking, returns, cart recovery.' },
-  { user_id: 'L00000201', name: 'Daniel Okafor', last_name: 'Okafor', account_id: '5520202', audience: 'lead', audience_label: 'Business prospect', headline: 'Office Manager · Brightwater Studio', blurb: 'Lead generation and sales: capture, qualify, book a consultation.' },
-  { user_id: 'E00000301', name: 'Sofia Alvarez', last_name: 'Alvarez', account_id: '5530303', audience: 'employee', audience_label: 'Team member', headline: 'Care Specialist · Customer Care', blurb: 'Internal IT and HR: onboarding, benefits, a VPN ticket.' },
+  { user_id: 'P00000101', name: 'Maya Chen', last_name: 'Chen', account_id: '5510101', audience: 'policyholder', audience_label: 'Policyholder', headline: 'Auto + Home · Brooklyn, NY', blurb: 'ID cards, an open claim, a bill due, a renewal and a DriveWell score.' },
+  { user_id: 'M00000201', name: 'Daniel Okafor', last_name: 'Okafor', account_id: '5520202', audience: 'member', audience_label: 'Health & pet member', headline: 'Health + Pet · Austin, TX', blurb: 'Telehealth, a deductible in progress, vet bills and a wearable to link.' },
+  { user_id: 'O00000301', name: 'Sofia Alvarez', last_name: 'Alvarez', account_id: '5530303', audience: 'ondemand', audience_label: 'On-demand customer', headline: 'On-demand cover · Charlotte, NC', blurb: 'Borrowing a car this weekend and flying to Lisbon: cover by the day.' },
 ];
-const AUDIENCE_ICON: Record<string, IconName> = { customer: 'bag-handle', lead: 'briefcase', employee: 'id-card' };
+const AUDIENCE_ICON: Record<string, IconName> = { policyholder: 'car', member: 'fitness', ondemand: 'flash' };
 const AUDIENCE_AREAS: Record<string, (keyof typeof AREA_UI)[]> = {
-  customer: ['support', 'commerce'], lead: ['sales'], employee: ['workplace'],
+  policyholder: ['documents', 'claims', 'roadside', 'billing', 'telematics'], member: ['wellness', 'billing', 'documents'], ondemand: ['coverage', 'roadside', 'support'],
 };
 
 export default function Login() {
@@ -53,10 +53,10 @@ export default function Login() {
       <ScrollView contentContainerStyle={[styles.wrap, { paddingTop: insets.top + 28, paddingBottom: insets.bottom + 24 }]} keyboardShouldPersistTaps="handled">
         <Wordmark height={22} />
         <View style={{ marginTop: 26, gap: 10 }}>
-          <Eyebrow color={theme.color.onDark}>One chatbot, with personalized context for everyone.</Eyebrow>
-          <Text style={styles.hero}>Ask once.{'\n'}Get the right answer.</Text>
+          <Eyebrow color={theme.color.onDark}>Insurance that knows you, even with no signal.</Eyebrow>
+          <Text style={styles.hero}>Your cover,{'\n'}in your pocket.</Text>
           <Text style={styles.sub}>
-            Support, orders, sales and the internal help desk in one assistant - grounded in your own data, governed, and still answering when you're offline.
+            ID cards, claims, roadside help, payments, DriveWell, wellness and cover by the day - personalized from your own policies, run by governed AI agents, and still working when you're offline.
           </Text>
         </View>
 
@@ -76,7 +76,7 @@ export default function Login() {
         </View>
 
         <View style={{ marginTop: 28, marginBottom: 2 }}>
-          <Eyebrow color={theme.color.onDarkMuted}>Demo sign-ins · one per audience</Eyebrow>
+          <Eyebrow color={theme.color.onDarkMuted}>Demo sign-ins · one per kind of customer</Eyebrow>
         </View>
         {personas.map((p) => (
           <Pressable key={p.user_id} onPress={() => void go(p.account_id, p.last_name)} style={({ pressed }) => [styles.persona, pressed && { opacity: 0.8 }]}>
@@ -89,7 +89,7 @@ export default function Login() {
                 <Text style={styles.paud}>{p.audience_label.toUpperCase()}</Text>
               </View>
               <Text style={styles.pmeta}>{p.headline} · #{p.account_id}</Text>
-              <Text style={styles.pblurb}>{(AUDIENCE_AREAS[p.audience] ?? []).map((a) => AREA_UI[a].label).join(' · ')}</Text>
+              <Text style={styles.pblurb}>{(AUDIENCE_AREAS[p.audience] ?? []).map((a) => AREA_UI[a].short).join(' · ')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={theme.color.onDarkMuted} />
           </Pressable>

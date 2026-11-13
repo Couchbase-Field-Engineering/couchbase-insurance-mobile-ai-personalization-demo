@@ -56,7 +56,7 @@ async def _billing_cards(p: dict, pols: list[dict]) -> list[dict]:
         due = amount_due(pol)
         if b.get("past_due") and due > 0:
             cards.append(_card(
-                "payment", f"pay-{pol['policy_id']}", f"Your {line} premium is past due", f"{pol['policy_id']} · {money(due)} including a {money(b.get('late_fee_usd', 0))} late fee",
+                "payment", f"pay-{pol['policy_id']}", f"Your {line} premium is past due", f"{pol['policy_id']} · {money(due)}" + (f" including a {money(b['late_fee_usd'])} late fee" if b.get("late_fee_usd") else ""),
                 f"Due {_in(days_until(b['next_due']))} - pay now to keep {_what(pol)} covered", money(due), 1.3,
                 {"label": "Pay now", "screen": "pay", "args": {"policy_id": pol["policy_id"]}}))
         elif due > 0 and (days_until(b.get("next_due")) or 99) <= C.GRACE_DAYS and not b.get("autopay"):

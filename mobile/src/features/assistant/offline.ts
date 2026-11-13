@@ -2,48 +2,69 @@
  * Offline Harborline: answers from what Couchbase Lite already holds.
  *
  *  1. this person's earlier answers (`chat` doc `answers`, keyed by normalized question)
- *  2. the Help Center FAQ synced in `catalog::v1` - and, on a team member's
- *     phone only, the Team Handbook FAQ in `handbook::v1`
- *  3. the person's own documents: profile (orders, cart, onboarding, benefits),
+ *  2. their own documents: profile (policies, claims, billing, DriveWell, wellness),
  *     feed cards and the context cache the server assembled
+ *  3. the Help Center FAQ synced in `catalog::v1` - and, on a health or pet
+ *     member's phone only, the Member Care Guide FAQ in `wellness::v1`
  *
  * Mirrors backend/app/assistant.py's intent keywords so the same question
- * lands on the same cached context offline as online. The audience gate
- * holds offline by construction: a customer's phone has no handbook document.
+ * lands on the same cached context offline as online. The members-only gate
+ * holds offline by construction: a phone without a health or pet plan has
+ * no Member Care Guide document.
+ *
+ * Offline matters most at the roadside: ID cards open, a tow or an SOS is
+ * queued with the last known location, and a claim is written up with
+ * photos, all before the phone finds a signal again.
  */
 import type { Snapshot } from '../../db/localDb';
+import { activeOnDemand, activePolicies, amountDue, driveDiscountPct, policySubject, roadsidePlan } from '../../insurance';
 import type { Area, ChatMessage, Cta, Faq } from '../../types';
 
+// Order matters: on a tie the earlier intent wins (as on the server).
 const KEYWORDS: Record<string, string[]> = {
-  service_recovery: ['damaged', 'defective', 'never arrived', 'missing', 'disappointed', 'upset', 'terrible', 'unacceptable', 'wrong item', 'scratched', 'faulty', 'broke'],
-  return: ['return', 'refund', 'exchange', 'send back', 'swap', 'money back'],
-  order: ['order', 'track', 'tracking', 'where is my', "where's my", 'delivery', 'deliver', 'shipped', 'shipping', 'arrive', 'package', 'reschedule', 'assembly'],
-  cart: ['cart', 'checkout', 'check out', 'basket', 'promo code', 'offer code', 'coupon'],
-  onboarding: ['onboarding', 'paperwork', 'i-9', 'i9', 'w-4', 'w4', 'direct deposit', 'handbook', 'new hire', 'checklist', 'code of conduct', 'security training', 'forms'],
-  it: ['password', 'vpn', 'laptop', 'locked out', 'ticket', 'software', 'install', 'access to', 'wifi', 'wi-fi', 'printer', 'outlook', 'mfa', 'help desk', 'sso', 'log in', 'login', 'sign in'],
-  hr: ['benefits', 'medical', 'dental', 'vision', '401k', '401(k)', 'pto', 'time off', 'vacation', 'day off', 'days off', 'payday', 'paycheck', 'get paid', 'parental', 'insurance', 'hsa', 'enroll', 'employee discount'],
-  product: ['recommend', 'looking for', 'suggest', 'desk', 'chair', 'monitor', 'headset', 'webcam', 'keyboard', 'tablet', 'compare', 'best', 'standing', 'warranty'],
-  sales: ['consultation', 'consult', 'quote', 'office', 'workspace', 'seats', 'bulk', 'volume', 'for business', 'appointment', 'specialist', 'our team', 'per seat'],
-  account: ['account', 'points', 'rewards', 'loyalty', 'tier', 'store credit', 'member'],
+  emergency: ['sos', 'emergency', 'been in an accident', 'after an accident', 'car accident', 'just had an accident', 'had a crash', 'crashed', 'been hit', 'hit me',
+    'rear-ended me', 'injured', 'hurt', 'ambulance', 'stranded'],
+  roadside: ['tow', 'flat tire', 'flat tyre', 'jump start', 'jump-start', 'jumpstart', 'dead battery', 'battery died', 'battery is dead', 'locked out',
+    'locked my keys', 'lockout', 'out of gas', 'out of fuel', 'ran out of', 'broke down', 'broken down', 'breakdown', "won't start", 'wont start', 'roadside', 'stuck on the'],
+  wellness: ['telehealth', 'doctor', 'video visit', 'virtual visit', 'nurse', 'therapist', 'dermatolog', 'prescription', 'health deductible', 'out-of-pocket',
+    'out of pocket', 'copay', 'vet', 'pet', 'dog', 'cat', 'wearable', 'apple watch', 'fitbit', 'garmin', 'oura', 'steps', 'fitness tracker', 'wellness', 'health plan', 'hsa', 'sick', 'symptom'],
+  claim: ['claim', 'file a claim', 'accident', 'damage', 'adjuster', 'estimate', 'repair shop', 'body shop', 'windshield', 'hail', 'stolen', 'break-in', 'broken into',
+    'burst pipe', 'leak', 'deductible', 'payout', 'dent', 'scratch', 'photos of', 'rear-ended'],
+  telematics: ['drivewell', 'driving score', 'my score', 'telematics', 'safe driver', 'safe-driver', 'pay per mile', 'pay-per-mile', 'mileage', 'miles', 'hard brak',
+    'speeding', 'last trip', 'recent trips', 'my trips', 'record a trip', 'usage-based', 'usage based', 'driving discount', 'my driving', 'beacon'],
+  billing: ['pay', 'bill', 'premium', 'autopay', 'auto-pay', 'auto pay', 'due', 'late fee', 'past due', 'overdue', 'renew', 'expire', 'expiring', 'went up',
+    'price increase', 'refund', 'charge', 'owe', 'balance', 'installment'],
+  documents: ['id card', 'insurance card', 'proof of insurance', 'my card', 'document', 'declarations', 'dec page', 'policy booklet', 'certificate', 'lender', 'landlord',
+    'mortgage company', 'evidence of insurance', 'copy of my policy', 'pdf', 'wallet', 'policy number', 'letter'],
+  coverage: ['on-demand', 'on demand', 'short-term', 'short term', 'temporary', 'borrow', 'rental car', 'renting a car', 'rent a car', 'travel', 'trip protection',
+    'my trip', 'trip to', 'vacation', 'holiday', 'flight', 'flying', 'for a day', 'for the weekend', 'this weekend', 'one day', 'few days', 'event', 'activate', 'quote',
+    'what cover', 'my cover', 'cover me', 'cover for my'],
+  account: ['my address', 'moved', 'moving', 'new address', 'my email', 'my phone', 'phone number', 'contact details', 'my details', 'update my', 'change my',
+    'add a driver', 'remove a driver', 'add my', 'new car', 'add a vehicle', 'raise my', 'liability limit', 'coverage change', 'am i covered', 'my coverage', 'my policy',
+    'my policies', 'name is wrong', 'misspelled'],
+  handoff: ['agent', 'human', 'real person', 'representative', 'speak to', 'talk to', 'call me', 'someone call', 'live chat', 'a person', 'supervisor'],
 };
 const AREA: Record<string, Area> = {
-  general: 'support', account: 'support', service_recovery: 'support', order: 'commerce', return: 'commerce', cart: 'commerce',
-  product: 'sales', sales: 'sales', it: 'workplace', hr: 'workplace', onboarding: 'workplace',
+  emergency: 'roadside', roadside: 'roadside', claim: 'claims', telematics: 'telematics', billing: 'billing', documents: 'documents',
+  coverage: 'coverage', wellness: 'wellness', account: 'support', handoff: 'support', general: 'support',
 };
-const EMPLOYEE_INTENTS = ['it', 'hr', 'onboarding'];
+const esc = (k: string) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// A keyword matches at the start of a word ("pet" doesn't match "competitor").
+const KW_RE: Record<string, RegExp[]> = Object.fromEntries(
+  Object.entries(KEYWORDS).map(([i, kws]) => [i, kws.map((k) => new RegExp(`(^|[^a-z0-9])${esc(k)}`))]),
+);
 
-export function classify(q: string, audience = 'customer'): string {
+export function classify(q: string): string {
   const m = q.toLowerCase();
   let best = 'general';
   let score = 0;
-  for (const [intent, kws] of Object.entries(KEYWORDS)) {
-    const s = kws.filter((k) => m.includes(k)).length * (intent === 'service_recovery' ? 2 : 1);
+  for (const [intent, rxs] of Object.entries(KW_RE)) {
+    const s = rxs.filter((rx) => rx.test(m)).length;
     if (s > score) {
       best = intent;
       score = s;
     }
   }
-  if (audience === 'employee' && best === 'service_recovery') best = 'it';
   return best;
 }
 
@@ -54,6 +75,7 @@ const nice = (iso?: string | null) => {
   const [y, mo, d] = iso.slice(0, 10).split('-').map(Number);
   return new Date(y, mo - 1, d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 };
+const usd = (n: number) => `$${n.toLocaleString('en-US', { maximumFractionDigits: n % 1 ? 2 : 0 })}`;
 
 function bestFaq(m: string, pool: Faq[]): Faq | undefined {
   return pool
@@ -62,85 +84,126 @@ function bestFaq(m: string, pool: Faq[]): Faq | undefined {
     .sort((a, b) => b.s - a.s)[0]?.f;
 }
 
+const RESTRICTED =
+  'Telehealth, deductible tracking, vet bills and wearable rewards are part of Harborline Health and Pet plans, so those answers are only available to members of those plans.';
+
 export function answerOffline(q: string, snap: Snapshot): Omit<ChatMessage, 'id' | 'at' | 'role'> {
   const p = snap.profile;
-  const audience = p?.audience ?? 'customer';
-  const intent = classify(q, audience);
+  const audience = p?.audience ?? 'policyholder';
+  const intent = classify(q);
   const area = AREA[intent];
   const prior = snap.chat?.answers?.[normalize(q)];
   if (prior) {
     return { text: prior.reply, intent, area: prior.area ?? area, offline: true, context: { status: 'device', latency_ms: 0 } };
   }
   const m = q.toLowerCase();
-  if (EMPLOYEE_INTENTS.includes(intent) && audience !== 'employee') {
-    // No handbook on this phone - there is nothing to answer from, by design.
-    return {
-      text: "That one's for the Harborline team workspace - IT, benefits and onboarding answers are only available to signed-in team members.",
-      intent, area, offline: true, restricted: true, context: { status: 'none', latency_ms: 0 },
-    };
+  if (intent === 'wellness' && audience !== 'member') {
+    // No Member Care Guide on this phone - there is nothing to answer from, by design.
+    return { text: RESTRICTED, intent, area, offline: true, restricted: true, context: { status: 'none', latency_ms: 0 } };
   }
-  const workplace = EMPLOYEE_INTENTS.includes(intent);
-  const pool = [...(workplace ? snap.handbook?.faq ?? [] : []), ...(snap.catalog?.faq ?? []), ...(workplace ? [] : snap.handbook?.faq ?? [])];
+  const members = intent === 'wellness';
+  const pool = [...(members ? snap.memberGuide?.faq ?? [] : []), ...(snap.catalog?.faq ?? [])];
   const faq = bestFaq(m, pool);
-  const ctx = snap.contexts[intent];
+  const ctx = snap.contexts[intent] ?? snap.contexts[`playbook_${intent}`];
   const actions: Cta[] = [];
   let text: string | null = null;
-  const personal = /\b(i|i'm|me|my|mine|we|our|us)\b/i.test(q) && !/^\s*(how (do|can) (i|we)|what (do|should) (i|we)|where (do|can) (i|we)|when (do|can) (i|we))\b/i.test(q);
+  const procedural = /^\s*(how (do|can|would|should) (i|we)|what (do|should) (i|we) (need|do)|where (do|can) (i|we)|when (do|can|should) (i|we)|do (i|we) need)\b/i.test(q);
+  const personal = (/\b(i|i'm|im|i've|me|my|mine|we|our|us)\b/i.test(q) && !procedural) || ['emergency', 'roadside', 'handoff'].includes(intent);
 
   if (p && personal) {
-    if (intent === 'order' && p.orders?.length) {
-      const o = p.orders.find((x) => ['processing', 'shipped', 'out_for_delivery'].includes(x.status)) ?? p.orders[0];
-      const open = o.status !== 'delivered' && o.status !== 'cancelled';
-      text = open
-        ? `From your phone: ${o.items.map((i) => i.name).join(' and ')} (order ${o.order_id}) is ${o.status.replace(/_/g, ' ')} with ${o.carrier}, arriving ${nice(o.eta)}${o.delivery_window ? `, ${o.delivery_window}` : ''}. Live tracking updates when you're back online.`
-        : `Order ${o.order_id} was ${o.status}${o.delivered_at ? ` on ${nice(o.delivered_at)}` : ''}.`;
-      actions.push({ label: `Open ${o.order_id}`, screen: 'order', args: { order_id: o.order_id } });
-    } else if (intent === 'return' || intent === 'service_recovery') {
-      const opts = snap.feed?.cards.find((c) => c.kind === 'return')?.options ?? [];
-      if (opts.length) {
-        text = `You're offline, but your return options are on this device: ${opts.slice(0, 3).map((o) => `${o.name} (${o.days_left} days left)`).join('; ')}. Start one now and I'll send it the moment you're back online.`;
-        actions.push({ label: 'Start a return or exchange', screen: 'return' });
+    const today = (snap.feed?.today ?? p.export_date).slice(0, 10);
+    const pols = activePolicies(p);
+    if (intent === 'emergency') {
+      text = "You're offline, so call 911 first if anyone is hurt. I can queue an SOS with your last known location and it reaches our emergency desk the moment you have a signal - or call "
+        + `${snap.catalog?.company.roadside_phone ?? 'the number on your ID card'}. Your ID card is on this phone.`;
+      actions.push({ label: 'Open SOS & roadside', screen: 'roadside', args: { sos: '1' } }, { label: 'Show my ID cards', screen: 'cards' });
+    } else if (intent === 'roadside') {
+      const plan = roadsidePlan(p, today, snap.catalog?.roadside_payg_usd ?? 79);
+      const where = p.roadside?.last_location?.label;
+      const live = (p.roadside?.dispatches ?? []).find((d) => ['dispatched', 'en_route', 'on_scene'].includes(d.status));
+      text = live ? `From your phone: ${live.provider} is on the way to ${live.location.label} for a ${live.service_name.toLowerCase()}, about ${live.eta_minutes} minutes from when it was dispatched. The live ETA updates when you're back online.` : `You're offline, but I can queue roadside help now and it's dispatched as soon as you reconnect${where ? ` - your last known location is ${where}` : ''}. `
+        + (plan.plan === 'included' ? `It's included with your auto policy (${plan.callsLeft} call${plan.callsLeft === 1 ? '' : 's'} left this term).`
+          : plan.plan === 'on-demand' ? "It's included with your on-demand cover." : `Without a roadside plan it's ${usd(plan.costUsd)} per call.`);
+      actions.push({ label: live ? 'Follow the truck' : 'Request roadside help', screen: 'roadside' });
+    } else if (intent === 'claim') {
+      const open = (p.claims ?? []).find((c) => !['paid', 'closed', 'denied'].includes(c.status));
+      if (open) {
+        text = `From your phone: claim ${open.claim_id} is ${open.status.replace(/_/g, ' ')}${open.adjuster ? ` with ${open.adjuster}` : ''}`
+          + `${open.estimate_usd ? `; the estimate is ${usd(open.estimate_usd)} and your deductible is ${usd(open.deductible_usd ?? 0)}` : ''}. The latest status syncs when you're back online.`;
+        actions.push({ label: `Open ${open.claim_id}`, screen: 'claim', args: { claim_id: open.claim_id } });
+      } else if (pols.some((x) => ['auto', 'home', 'renters'].includes(x.line))) {
+        text = "You can file a claim offline: take the photos, describe what happened and I'll send it to the Claims Agent the moment you reconnect.";
+        actions.push({ label: 'File a claim', screen: 'claim' });
       }
-    } else if (intent === 'cart' && p.cart?.items?.length) {
-      const c = p.cart;
-      text = `Your cart is saved on this device: ${c.items.map((i) => i.name).join(' and ')} ($${c.subtotal_usd})${c.offer ? ` - code ${c.offer.code} takes ${c.offer.pct_off}% off until ${nice(c.offer.expires)}` : ''}. Check out now and it's placed as soon as you reconnect.`;
-      actions.push({ label: 'Check out', tool: 'checkout_cart', args: { apply_offer: true } });
-    } else if (intent === 'sales' || (intent === 'product' && audience === 'lead')) {
-      const card = snap.feed?.cards.find((c) => c.kind === 'consult');
-      if (p.consultation) text = `You're booked with ${p.consultation.rep} on ${nice(p.consultation.date)} at ${p.consultation.time}.`;
-      else if (card?.slots?.length) {
-        text = 'You can pick a consultation time offline - open slots are saved on this device, and your booking is sent when you reconnect.';
-        actions.push({ label: 'Pick a time', screen: 'consult' });
-      }
-    } else if (intent === 'account' && p.loyalty) {
-      text = `You're a ${p.loyalty.tier} ${p.loyalty.program} member with ${p.loyalty.points.toLocaleString('en-US')} points.`;
-    } else if (intent === 'onboarding' && p.onboarding) {
-      const pend = p.onboarding.tasks.filter((t) => t.status !== 'complete').sort((a, b) => (a.due_date < b.due_date ? -1 : 1));
-      text = pend.length
-        ? `From your phone: ${pend.length} onboarding task${pend.length > 1 ? 's' : ''} left. Next is ${pend[0].title}, due ${nice(pend[0].due_date)}. You can sign offline - it syncs when you're connected.`
-        : 'Your onboarding is complete.';
-      if (pend.length) actions.push({ label: 'Open my checklist', screen: 'onboarding' });
-    } else if (intent === 'hr' && p.hr) {
-      if (/(time off|pto|vacation|day off|days off)/.test(m)) {
-        text = `You have ${p.hr.pto.balance_days} days of paid time off. Pick your dates now; the request goes to ${p.employment?.manager} when you reconnect.`;
-        actions.push({ label: 'Request time off', screen: 'timeoff' });
-      } else if (/(paid|payday|paycheck)/.test(m)) {
-        text = `Your next pay date is ${nice(p.hr.pay.next_pay_date)}.`;
-      } else if (!p.hr.benefits.enrolled) {
-        text = `You haven't enrolled in benefits yet - your window closes ${nice(p.hr.benefits.enrollment_deadline)}. The plans are saved on this device.`;
-        actions.push({ label: 'Compare plans & enroll', screen: 'benefits' });
-      }
-    } else if (intent === 'it' && p.it) {
-      const t = p.it.open_tickets;
-      if (/(password|locked|sign in|log in|login)/.test(m)) {
-        text = `Your password expires in ${p.it.password_expires_in_days} days. A reset needs a connection, but I can queue it now and it runs when you're back online.`;
-        actions.push({ label: 'Reset my password', tool: 'reset_password', args: { system: 'sso' } });
+    } else if (intent === 'billing' && pols.length) {
+      const byDue = [...pols].sort((a, b) => ((a.billing.next_due ?? '') < (b.billing.next_due ?? '') ? -1 : 1));
+      const owing = byDue.filter((x) => amountDue(x) > 0);
+      const offer = pols.find((x) => x.renewal?.status === 'offered');
+      if (/(renew|expire|went up|price increase)/.test(m) && offer?.renewal) {
+        const ch = offer.renewal.change_pct;
+        text = `From your phone: ${offer.policy_id} renews ${nice(offer.expires)} at ${usd(offer.renewal.offer_premium_usd)}${ch ? ` (${ch > 0 ? '+' : ''}${ch}%)` : ''}. You can accept it offline; it's processed when you reconnect.`;
+        actions.push({ label: 'Review renewal', screen: 'pay', args: { policy_id: offer.policy_id, renew: '1' } });
+      } else if (owing.length) {
+        const o = owing[0];
+        text = `From your phone: ${usd(amountDue(o))} is ${o.billing.past_due ? `past due on ${o.policy_id} (including a ${usd(o.billing.late_fee_usd)} late fee)` : `due ${nice(o.billing.next_due)} on ${o.policy_id}`}. Pay now and it posts as soon as you're online.`;
+        actions.push({ label: `Pay ${usd(amountDue(o))}`, screen: 'pay', args: { policy_id: o.policy_id } });
       } else {
-        text = t.length
-          ? `Your open tickets: ${t.map((x) => `${x.ticket_id} - ${x.summary} (${x.status.replace(/_/g, ' ')})`).join('; ')}. You can open another offline; it's sent when you reconnect.`
-          : "You're offline, but you can write up a ticket now - it's sent to the help desk when you reconnect.";
-        actions.push({ label: 'Open a help desk ticket', screen: 'ticket', args: { summary: q.slice(0, 160) } });
+        const next = byDue[0];
+        text = `Nothing is due right now. Your next payment is ${usd(next.billing.installment_usd)} on ${nice(next.billing.next_due)} for ${next.policy_id}${next.billing.autopay ? ', on AutoPay' : ''}.`;
+        actions.push({ label: 'Payments & renewals', screen: 'pay' });
       }
+    } else if (intent === 'documents') {
+      const cards = pols.filter((x) => x.id_card);
+      const od = activeOnDemand(p, today);
+      const n = cards.length + od.length;
+      if (n) {
+        text = `Your ${[...cards.map((x) => `${x.line} ID card (${policySubject(x)})`), ...od.map((c) => `${c.name} certificate`)].join(' and ')} ${n > 1 ? 'are' : 'is'} stored on this phone and open${n > 1 ? '' : 's'} without a signal.`;
+        actions.push({ label: 'Show my ID cards', screen: 'cards' });
+      }
+    } else if (intent === 'telematics') {
+      const t = p.telematics;
+      if (t?.enrolled) {
+        const pct = driveDiscountPct(t.score);
+        text = `From your phone: your DriveWell score is ${t.score ?? 'not ready yet'} over ${t.trips?.length ?? 0} trips and ${t.miles_month ?? 0} miles this month`
+          + `${t.program === 'safe-driver' ? `, worth ${pct}% off at renewal` : ''}. Trips keep recording offline and are scored when they sync.`;
+        actions.push({ label: 'My driving', screen: 'drive' });
+      } else if (pols.some((x) => x.line === 'auto')) {
+        text = "You're not in DriveWell yet. Joining takes 5% off straight away and up to 25% at renewal - you can enroll offline and it starts when you reconnect.";
+        actions.push({ label: 'Join DriveWell', screen: 'drive' });
+      }
+    } else if (intent === 'coverage') {
+      const od = activeOnDemand(p, today);
+      const plans = p.on_demand?.plans ?? {};
+      if (od.length) text = `${od.map((c) => `${c.name} is active until ${nice(c.end)}`).join('; ')}. The certificate is on this phone.`;
+      else if (plans.drive || plans.trip) {
+        text = `You can set up cover offline${plans.drive ? ` for the ${plans.drive.vehicle}` : ''}${plans.drive && plans.trip ? ' and' : ''}${plans.trip ? ` for your trip to ${plans.trip.destination}` : ''}. `
+          + "Prices are saved on this phone; cover starts once the request syncs, so it isn't active until you're back online.";
+      } else {
+        text = "On-demand prices are saved on this phone: borrowed car $12 a day, rental $9 a day, trips from $19. Cover starts once your request syncs, so it isn't active while you're offline.";
+      }
+      actions.push({ label: od.length ? 'Show certificate' : 'See on-demand cover', screen: od.length ? 'cards' : 'coverage' });
+    } else if (intent === 'wellness' && p.wellness) {
+      const w = p.wellness;
+      if (/(deductible|out.of.pocket|oop)/.test(m) && w.deductible) {
+        const d = w.deductible;
+        text = `From your phone: you've met ${usd(d.met_usd)} of your ${usd(d.individual_usd)} deductible and ${usd(d.oop_met_usd)} of your ${usd(d.oop_max_usd)} out-of-pocket maximum. It resets ${nice(d.resets)}.`;
+        actions.push({ label: 'See my plan', screen: 'wellness', args: { tab: 'deductible' } });
+      } else if (/(vet|pet|dog|cat)/.test(m)) {
+        text = "You can submit a vet bill offline: photograph the invoice, enter the total and it's sent to the Wellness Agent when you reconnect.";
+        actions.push({ label: 'Submit a vet bill', screen: 'wellness', args: { tab: 'pet' } });
+      } else if (w.telehealth?.upcoming) {
+        const u = w.telehealth.upcoming;
+        text = `Your ${u.type_name.toLowerCase()} video visit with ${u.provider} is ${nice(u.date)} at ${u.time}. Joining it needs a connection.`;
+      } else if (/(doctor|telehealth|visit|sick|nurse|therapist)/.test(m)) {
+        text = 'Open appointments are saved on this phone. Pick one now and the booking is confirmed when you reconnect. If this is urgent, call 911.';
+        actions.push({ label: 'Book a visit', screen: 'wellness', args: { tab: 'telehealth' } });
+      }
+    } else if (intent === 'account') {
+      text = `From your phone: we have ${p.address ?? p.home_city}, ${p.email ?? 'no email'} and ${p.phone ?? 'no phone number'} on your account. You can write up a change offline and it's applied when you reconnect.`;
+      actions.push({ label: 'Update my details', screen: 'support' });
+    } else if (intent === 'handoff') {
+      text = `A licensed agent needs a connection. I can queue the request now and they'll reach you when you're back online, or call ${snap.catalog?.company.support_phone ?? 'customer care'} (${snap.catalog?.company.support_hours ?? 'every day'}).`;
+      actions.push({ label: 'Request a licensed agent', screen: 'support', args: { tab: 'agent' } });
     }
   }
   if (!text && faq) text = faq.a;
@@ -155,6 +218,6 @@ export function answerOffline(q: string, snap: Snapshot): Omit<ChatMessage, 'id'
     actions,
     offline: true,
     context: { status: ctx || faq ? 'device' : 'none', latency_ms: 0 },
-    sources: faq && text === faq.a ? [{ title: `${workplace ? 'Team Handbook' : 'Help Center'} (on device)`, snippet: faq.q, kind: 'couchbase-lite' }] : [],
+    sources: faq && text === faq.a ? [{ title: `${members ? 'Member Care Guide' : 'Help Center'} (on device)`, snippet: faq.q, kind: 'couchbase-lite' }] : [],
   };
 }
