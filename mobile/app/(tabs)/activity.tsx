@@ -69,7 +69,7 @@ export default function Activity() {
                 <Text style={styles.itemTitle}>{q.title}</Text>
                 {q.summary ? <Text style={styles.meta}>{q.summary}</Text> : null}
                 <Text style={styles.tiny}>
-                  {q.governed ? `Governed by Agent Operations Manager · ${AGENT_NAME[agent] ?? agent}` : q._local ? `Queued in Couchbase Lite for the ${AGENT_NAME[agent] ?? agent}` : `Processed · ${AGENT_NAME[agent] ?? agent}`}
+                  {q.governed ? `Governed by Couchbase Labs Agent Operations Manager · ${AGENT_NAME[agent] ?? agent}` : q._local ? `Queued in Couchbase Lite for the ${AGENT_NAME[agent] ?? agent}` : `Processed · ${AGENT_NAME[agent] ?? agent}`}
                   {q.remembered ? ' · remembered' : ''}
                   {q.trace_id ? ` · trace ${q.trace_id.slice(0, 8)}` : ''}
                 </Text>

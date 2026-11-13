@@ -13,14 +13,14 @@ An insurance app that knows the customer, works with no signal, and hands every 
 | 7 | **Health & wellness** | *Health & wellness*: book telehealth, track the deductible, upload a vet bill for a pet plan, link a wearable for premium credit | Wellness Agent |
 | 8 | **Short-term, on-demand coverage** | *On-demand cover*: borrowed-car, rental-car, trip and one-day event cover, bought and activated from the phone | Coverage Agent |
 
-It is built on the [OneChat demo](https://github.com/Couchbase-Field-Engineering/couchbase-onechat-mobile-ai-personalization-demo) framework and the same Couchbase stack: **Couchbase Lite** on the phone, **Sync Gateway**, **Couchbase Server**, and the **Couchbase Agent Operations Manager (AOM)** for the AI plane.
+It is built on the [OneChat demo](https://github.com/Couchbase-Field-Engineering/couchbase-onechat-mobile-ai-personalization-demo) framework and the same Couchbase stack: **Couchbase Lite** on the phone, **Sync Gateway**, **Couchbase Server**, and the **Couchbase Labs Agent Operations Manager** for the AI plane.
 
-* Answers are grounded in AOM's **Knowledge Base**: a Help Center for everyone, a Member Care Guide for health and pet members only, and one profile document per person.
-* Harborline is registered as two AOM **RAG Applications** (`insurance-assistant`, `insurance-wellness`), so queries, cache hits and savings show per audience.
-* The context built for each personal answer is cached in AOM's **Context Cache** and in Couchbase, which syncs it to the phone for offline answers.
-* LLM calls go through AOM's **LLM Caching** gateway: "How do I file a claim?" is paid for once and is free for the next person.
-* Every action is an RBAC-checked, traced and audited AOM **tool call**, run by the agent that owns that use case. Each specialist is limited to its own tools (the Billing Agent cannot file a claim) and uses **Agent Memory** to recall and record what happened.
-* Late-fee waivers wait for a billing supervisor and coverage changes for an underwriter in AOM's **approval tier**.
+* Answers are grounded in Couchbase Labs Agent Operations Manager's **Knowledge Base**: a Help Center for everyone, a Member Care Guide for health and pet members only, and one profile document per person.
+* Harborline is registered as two Couchbase Labs Agent Operations Manager **RAG Applications** (`insurance-assistant`, `insurance-wellness`), so queries, cache hits and savings show per audience.
+* The context built for each personal answer is cached in Couchbase Labs Agent Operations Manager's **Context Cache** and in Couchbase, which syncs it to the phone for offline answers.
+* LLM calls go through Couchbase Labs Agent Operations Manager's **LLM Caching** gateway: "How do I file a claim?" is paid for once and is free for the next person.
+* Every action is an RBAC-checked, traced and audited Couchbase Labs Agent Operations Manager **tool call**, run by the agent that owns that use case. Each specialist is limited to its own tools (the Billing Agent cannot file a claim) and uses **Agent Memory** to recall and record what happened.
+* Late-fee waivers wait for a billing supervisor and coverage changes for an underwriter in Couchbase Labs Agent Operations Manager's **approval tier**.
 
 ---
 
@@ -32,15 +32,15 @@ It is built on the [OneChat demo](https://github.com/Couchbase-Field-Engineering
 | **Personalization** | *For You* is ranked from last night's export (propensity scores, segments, policies) and re-ranked live after every action: a truck on the way goes to the top, a paid bill drops out, a DriveWell score turns into a renewal discount. |
 | **Offline first** | Every screen renders from the on-device database. *Profile → Offline mode* pauses replication: the ID card still opens, a claim with photos or a tow request is saved as a `requests` document ("On device"), and the assistant answers from the phone. |
 | **Members-only knowledge** | The Member Care Guide lives in its own RAG application and its own Sync Gateway channel (`members`). Someone without a health or pet plan who asks about telehealth gets a polite refusal with nothing retrieved (`restricted: true`), and the document is never on their phone. |
-| **AOM RAG Applications** | Shared questions ("How do I file a claim?") go to `POST /v1/agent/rag/<app>/query`: retrieval cache, Knowledge Base search scoped to one document, LLM cache. |
-| **Context Caching** | Personal questions ("What's the status of my claim?") assemble context once per person and intent (profile document, policy passages, governed tool results) and store it in AOM's Context Cache and in `context_cache` in Couchbase. Follow-ups reuse it; any change to the person's data invalidates it. |
+| **Couchbase Labs Agent Operations Manager RAG Applications** | Shared questions ("How do I file a claim?") go to `POST /v1/agent/rag/<app>/query`: retrieval cache, Knowledge Base search scoped to one document, LLM cache. |
+| **Context Caching** | Personal questions ("What's the status of my claim?") assemble context once per person and intent (profile document, policy passages, governed tool results) and store it in Couchbase Labs Agent Operations Manager's Context Cache and in `context_cache` in Couchbase. Follow-ups reuse it; any change to the person's data invalidates it. |
 | **LLM Caching** | Shared answers contain no personal data, so they are reused across everyone. The chat shows a chip for each: `Context cache · built / hit`, `LLM cache · miss / exact / semantic`. |
-| **Seven agents, one tool server** | 28 tools on the `insurance-services` MCP server, called through `POST /v1/tools/invoke`. The assistant answers and handles documents and support; six specialists run the rest, each with its own AOM identity, tool scope and Agent Memory. |
-| **Human approval** | `request_fee_waiver` and `request_coverage_change` return `202 pending_approval`: the phone shows **Awaiting approval** until someone decides on AOM's *Approvals* page. |
+| **Seven agents, one tool server** | 28 tools on the `insurance-services` MCP server, called through `POST /v1/tools/invoke`. The assistant answers and handles documents and support; six specialists run the rest, each with its own Couchbase Labs Agent Operations Manager identity, tool scope and Agent Memory. |
+| **Human approval** | `request_fee_waiver` and `request_coverage_change` return `202 pending_approval`: the phone shows **Awaiting approval** until someone decides on Couchbase Labs Agent Operations Manager's *Approvals* page. |
 
 ### The agents
 
-| Agent (AOM id) | Triggered by | Tools beyond the two shared reads |
+| Agent (Couchbase Labs Agent Operations Manager id) | Triggered by | Tools beyond the two shared reads |
 |---|---|---|
 | Harborline Assistant (`insurance-assistant`) | Every chat turn; documents and support requests | all 8 read tools; `request_document`, `update_contact_details`, `request_policy_change`, `request_coverage_change`, `request_live_agent` |
 | Claims Agent (`insurance-claims-agent`) | `file_claim`, `add_claim_evidence` | `get_claims` |
@@ -50,26 +50,26 @@ It is built on the [OneChat demo](https://github.com/Couchbase-Field-Engineering
 | Wellness Agent (`insurance-wellness-agent`) | `book_telehealth`, `submit_vet_bill`, `link_wearable` | `get_wellness_summary` |
 | Coverage Agent (`insurance-coverage-agent`) | `activate_coverage` | `get_coverage_options` |
 
-Every specialist can also call `get_customer_context` and `get_policies`. One request is one AOM run: the specialist recalls what AOM remembers about this customer in its domain (`POST /v1/memory/search`), invokes the tool, and writes an episodic memory of the outcome (`POST /v1/memory`). The assistant recalls the same memories on its next turn. Definitions are in [`backend/app/agents.py`](backend/app/agents.py).
+Every specialist can also call `get_customer_context` and `get_policies`. One request is one Couchbase Labs Agent Operations Manager run: the specialist recalls what Couchbase Labs Agent Operations Manager remembers about this customer in its domain (`POST /v1/memory/search`), invokes the tool, and writes an episodic memory of the outcome (`POST /v1/memory`). The assistant recalls the same memories on its next turn. Definitions are in [`backend/app/agents.py`](backend/app/agents.py).
 
 ---
 
 ## Architecture
 
-![Architecture: nightly export, phone with Couchbase Lite, the demo stack (backend, Couchbase Server, Sync Gateway) and the Agent Operations Manager](docs/images/architecture.svg)
+![Architecture: nightly export, phone with Couchbase Lite, the demo stack (backend, Couchbase Server, Sync Gateway) and the Couchbase Labs Agent Operations Manager](docs/images/architecture.svg)
 
 | # | Flow |
 |---|---|
 | **1** | Every night an `exportTime=YYYYMMDD` JSON Lines partition of policyholders, members and on-demand customers lands in the export folder. The loader picks up the newest one with a `_SUCCESS` marker. |
 | **2** | The loader upserts every profile, builds each person's *For You* feed, and publishes the catalog (and the members-only guide) in Couchbase Server. |
-| **3** | The loader replaces the AOM **Knowledge Base** documents (Help Center, Member Care Guide, one profile per person up to `KB_PROFILE_LIMIT`) and re-scopes the two **RAG Applications** to today's documents. |
+| **3** | The loader replaces the Couchbase Labs Agent Operations Manager **Knowledge Base** documents (Help Center, Member Care Guide, one profile per person up to `KB_PROFILE_LIMIT`) and re-scopes the two **RAG Applications** to today's documents. |
 | **4** | Sign-in: the backend creates the person's Sync Gateway user (channels `user:<id>`, `catalog`, plus `members` for health and pet members) and mints a session. |
 | **5** | **Couchbase Lite** replicates continuously with Sync Gateway. Every screen renders from the phone; taps become `requests` documents saved locally. |
-| **6** | Chat goes to `/api/chat`. Shared questions go to the audience's RAG Application in one call. Personal questions check AOM's Context Cache; on a miss the assistant builds context from the Knowledge Base, the system of record and read-only tools, then caches it. |
-| **7** | AOM calls the LLM provider only on a cache miss. |
+| **6** | Chat goes to `/api/chat`. Shared questions go to the audience's RAG Application in one call. Personal questions check Couchbase Labs Agent Operations Manager's Context Cache; on a miss the assistant builds context from the Knowledge Base, the system of record and read-only tools, then caches it. |
+| **7** | Couchbase Labs Agent Operations Manager calls the LLM provider only on a cache miss. |
 | **8** | Sync Gateway carries requests up and results back down. |
 | **9** | The worker hands each request to the agent that owns its tool, which runs it through `POST /v1/tools/invoke`, so RBAC, tool scope, the approval tier, a trace and an audit entry are applied. |
-| **10** | AOM calls the `insurance-services` MCP server, which applies the change in Couchbase; the updated profile, activity and feed sync back to the phone. |
+| **10** | Couchbase Labs Agent Operations Manager calls the `insurance-services` MCP server, which applies the change in Couchbase; the updated profile, activity and feed sync back to the phone. |
 
 ### A breakdown with no signal, end to end
 
@@ -80,7 +80,7 @@ sequenceDiagram
   participant App as App + Couchbase Lite
   participant SG as Sync Gateway
   participant BE as Backend worker
-  participant AOM as Agent Ops Manager
+  participant AOM as Couchbase Labs Agent Operations Manager
   participant MCP as insurance-services MCP
   participant CB as Couchbase Server
 
@@ -107,9 +107,9 @@ stateDiagram-v2
   [*] --> OnDevice: tap Confirm (Couchbase Lite)
   OnDevice --> pending: replicator pushes
   pending --> processing: worker claims it
-  processing --> confirmed: AOM tools/invoke OK
-  processing --> awaiting_approval: AOM 202 (fee waiver, coverage change)
-  awaiting_approval --> confirmed: approved in AOM
+  processing --> confirmed: Couchbase Labs Agent Operations Manager tools/invoke OK
+  processing --> awaiting_approval: Couchbase Labs Agent Operations Manager 202 (fee waiver, coverage change)
+  awaiting_approval --> confirmed: approved in Couchbase Labs Agent Operations Manager
   awaiting_approval --> failed: denied / expired
   processing --> failed: business rule (appointment taken, cover overlaps, nothing due...)
   confirmed --> [*]
@@ -119,7 +119,7 @@ stateDiagram-v2
 
 ## Quick start
 
-### 1. Browser preview in about 2 minutes (no Docker, no AOM)
+### 1. Browser preview in about 2 minutes (no Docker, no Couchbase Labs Agent Operations Manager)
 
 The backend can run on an in-memory store, and the app has a browser preview engine that syncs the same documents over REST. Use this to look at the UX; Couchbase Lite needs a device build (step 3).
 
@@ -131,11 +131,11 @@ uvicorn app.main:app --port 8200                    # STORE_DRIVER=memory by def
 cd mobile && npm install && npx expo start --web    # sign in with a demo persona
 ```
 
-Without AOM the assistant writes its answers itself from the same context and the tools run in-process, so every flow works. The request tracker then says "ungoverned", there is no Agent Memory, and the two approval-tier tools apply immediately instead of waiting for a person.
+Without Couchbase Labs Agent Operations Manager the assistant writes its answers itself from the same context and the tools run in-process, so every flow works. The request tracker then says "ungoverned", there is no Agent Memory, and the two approval-tier tools apply immediately instead of waiting for a person.
 
-### 2. Full stack: Couchbase, Sync Gateway and AOM
+### 2. Full stack: Couchbase, Sync Gateway and Couchbase Labs Agent Operations Manager
 
-You need Docker Desktop, and the [Couchbase Agent Operations Manager](https://github.com/erikhinderer/couchbase-agent-operations-manager) running on the same machine at `https://localhost:8090` with its admin password set.
+You need Docker Desktop, and the [Couchbase Labs Agent Operations Manager](https://github.com/erikhinderer/couchbase-agent-operations-manager) running on the same machine at `https://localhost:8090` with its admin password set.
 
 ```bash
 python3 datagen/generate_mock_export.py
@@ -144,11 +144,11 @@ cp .env.example .env
 docker compose up -d --build               # couchbase, init, sync-gateway, sg-init, backend, web
 docker compose logs -f backend             # wait for "Loaded export …"
 
-python3 scripts/register_with_aom.py --admin-password '<AOM admin password>'
+python3 scripts/register_with_aom.py --admin-password '<Couchbase Labs Agent Operations Manager admin password>'
 docker compose up -d --build backend       # picks up AOM_* from .env, publishes the KB, scopes the RAG apps
 ```
 
-`register_with_aom.py` is idempotent; `--rotate` issues new agent keys. After it runs, AOM shows:
+`register_with_aom.py` is idempotent; `--rotate` issues new agent keys. After it runs, Couchbase Labs Agent Operations Manager shows:
 
 * **Agents**: *Harborline Assistant* and the six specialists (keys written to `.env` as `AOM_AGENT_API_KEY` and the JSON map `AOM_SPECIALIST_AGENT_KEYS`)
 * **Servers / Catalog**: `insurance-services` (trusted) and its 28 tools
@@ -157,7 +157,7 @@ docker compose up -d --build backend       # picks up AOM_* from .env, publishes
 * **RAG Applications**: `insurance-assistant` (Help Center) and `insurance-wellness` (Member Care Guide)
 * **Context Cache**: entries in `rag:<app>:user-context`, one per person and intent
 
-Configure an LLM provider key in AOM to get generated answers. Without one, AOM returns a labelled stub, the backend writes the answer from the same retrieved context, and AOM still reports the cache status.
+Configure an LLM provider key in Couchbase Labs Agent Operations Manager to get generated answers. Without one, Couchbase Labs Agent Operations Manager returns a labelled stub, the backend writes the answer from the same retrieved context, and Couchbase Labs Agent Operations Manager still reports the cache status.
 
 | Port | Service |
 |---|---|
@@ -175,7 +175,7 @@ Configure an LLM provider key in AOM to get generated answers. Without one, AOM 
 
 Change them with `DEMO_USERNAME` / `DEMO_PASSWORD` in `.env` (Compose) or `web.auth.username` / `web.auth.password` (Helm). The container serves a self-signed certificate it generates on first start, so the browser warns once; add the address people use to `TLS_HOSTS` (Compose) so it is in the certificate, or serve a real one by mounting `tls.crt` / `tls.key` at `/etc/nginx/tls` (Helm: `web.tls.secretName`). Plain `http://` on the same port redirects to HTTPS, and `/signout` ends the session. The sign-in covers the browser UI only: the backend API and Sync Gateway ports are unchanged.
 
-The ports are chosen so this stack runs alongside AOM and the OneChat demo (5150 / 8202 / 4988).
+The ports are chosen so this stack runs alongside Couchbase Labs Agent Operations Manager and the OneChat demo (5150 / 8202 / 4988).
 
 ### 3. The app on a device with Couchbase Lite
 
@@ -194,14 +194,14 @@ The `web` service serves a prebuilt browser bundle (`web/dist.tgz`). After chang
 
 ### 4. Kubernetes with Helm (K3s / Rancher)
 
-`deploy/k8s/deploy.sh` deploys AOM (**agent-ops**) and this demo (**insurance-app**) onto a single-node K3s cluster without a container registry:
+`deploy/k8s/deploy.sh` deploys Couchbase Labs Agent Operations Manager (**agent-ops**) and this demo (**insurance-app**) onto a single-node K3s cluster without a container registry:
 
 ```bash
 AOM_ADMIN_PASSWORD='<12+ characters>' ./deploy/k8s/deploy.sh
-AOM_ADMIN_PASSWORD='<current AOM password>' ONLY=insurance ./deploy/k8s/deploy.sh   # AOM is already there
+AOM_ADMIN_PASSWORD='<current Couchbase Labs Agent Operations Manager password>' ONLY=insurance ./deploy/k8s/deploy.sh   # Couchbase Labs Agent Operations Manager is already there
 ```
 
-It builds the images, copies them over SSH into K3s's containerd, and runs `helm upgrade --install` for [`helm/insurance-app`](helm/insurance-app) with [`deploy/k8s/values-mother.yaml`](deploy/k8s/values-mother.yaml). In the cluster the backend registers itself with AOM (`AOM_AUTO_REGISTER=true`): it adds the MCP server, issues the seven agent identities, turns on the approval tier and publishes the Knowledge Base and RAG applications. Progress is in `/api/status` under `aom.registration`. A CronJob writes a new export partition every morning and the backend picks it up. `deploy/k8s/diagnose.sh` prints the state of every piece.
+It builds the images, copies them over SSH into K3s's containerd, and runs `helm upgrade --install` for [`helm/insurance-app`](helm/insurance-app) with [`deploy/k8s/values-mother.yaml`](deploy/k8s/values-mother.yaml). In the cluster the backend registers itself with Couchbase Labs Agent Operations Manager (`AOM_AUTO_REGISTER=true`): it adds the MCP server, issues the seven agent identities, turns on the approval tier and publishes the Knowledge Base and RAG applications. Progress is in `/api/status` under `aom.registration`. A CronJob writes a new export partition every morning and the backend picks it up. `deploy/k8s/diagnose.sh` prints the state of every piece.
 
 ---
 
@@ -213,9 +213,9 @@ Sign in with the account number and last name (the sign-in screen lists them). T
    * *For You*: her claim estimate is ready, the auto policy renews in 21 days, $158 is due in 4 days, and her DriveWell score of 88 is worth 15% off.
    * *Chat*: "How do I file a claim?" → `LLM cache · miss`. "What's the status of my claim?" → `Context cache · built`, the adjuster and estimate, and a **Track** action. Ask again: `Context cache · hit`.
    * *ID cards & documents*: the auto ID card with both vehicles. *Profile → Offline mode* **on**: the card still opens.
-   * Still offline, *Roadside & emergency* → **Flat tire change**: it is saved **On device**. Ask "I have a flat tire" in Chat: **Answered on device**. Switch offline mode **off**: the request syncs, the Roadside Agent dispatches, and *For You* leads with the truck's ETA. In AOM, show the trace for `insurance-services::request_roadside` and the agent's memory.
+   * Still offline, *Roadside & emergency* → **Flat tire change**: it is saved **On device**. Ask "I have a flat tire" in Chat: **Answered on device**. Switch offline mode **off**: the request syncs, the Roadside Agent dispatches, and *For You* leads with the truck's ETA. In Couchbase Labs Agent Operations Manager, show the trace for `insurance-services::request_roadside` and the agent's memory.
    * *Claims* → **File a new claim** (windshield, two photos) → the Claims Agent files it. *DriveWell* → **Save trip** → the score moves. *Payments & renewals* → **Apply** the DriveWell discount, then **Renew**.
-   * *Support* → *Change a policy* → **Add a driver**: **Awaiting approval** until an underwriter approves it in AOM → *Approvals*.
+   * *Support* → *Change a policy* → **Add a driver**: **Awaiting approval** until an underwriter approves it in Couchbase Labs Agent Operations Manager → *Approvals*.
    * "Can I book a telehealth visit?" is refused: members-only knowledge is not in her scope.
 2. **Daniel Okafor** · member, health + pet plans · `5520202` / `Okafor`
    * "How do I file a claim?" → **LLM cache exact hit** from Maya's question: shared knowledge, no personal data.
@@ -243,7 +243,7 @@ Shared questions are drawn Zipf-style, so a few dominate: the canonical wording 
 
 ## Reset the demo
 
-`POST /api/demo/reset` (the **Reset demo** button, or `python scripts/reset_demo.py`) puts the three personas, plus everyone who changed something since the load, back to today's export: requests, chat and cached context are deleted, profiles reloaded, telehealth appointments released, feeds rebuilt, and their AOM memories and Harborline's cache namespaces purged. Sync Gateway replicates the result to the phone. `--dry-run` shows who would be reset.
+`POST /api/demo/reset` (the **Reset demo** button, or `python scripts/reset_demo.py`) puts the three personas, plus everyone who changed something since the load, back to today's export: requests, chat and cached context are deleted, profiles reloaded, telehealth appointments released, feeds rebuilt, and their Couchbase Labs Agent Operations Manager memories and Harborline's cache namespaces purged. Sync Gateway replicates the result to the phone. `--dry-run` shows who would be reset.
 
 ---
 
@@ -258,7 +258,7 @@ Bucket `insurance`, scope `ins`. Sync Gateway replicates the first seven collect
 | `activity` | `activity::<user>` | actions | What was done in the app: claims, dispatches, payments, trips, visits, cover |
 | `requests` | `req::<user>::<uuid>` | **the phone** (create), worker (status) | Offline-first queue; the sync function allows only the owner to create a `pending` request |
 | `chat` | `chat::<user>` | assistant | History, plus answers reusable offline |
-| `context_cache` | `ctx::<user>::<intent>` | assistant | Phone copy of the AOM Context Cache entry |
+| `context_cache` | `ctx::<user>::<intent>` | assistant | Phone copy of the Couchbase Labs Agent Operations Manager Context Cache entry |
 | `catalog` | `catalog::v1`, `wellness::v1` | loader | Products, forms and the Help Center FAQ (channel `catalog`); the Member Care Guide (channel `members`) |
 | `inventory` | `inv::v1` | actions | Open telehealth appointments. Server only |
 | `lookups` | login index, KB document ids, load state | loader | Server only |
@@ -275,8 +275,8 @@ Backend variables go in `.env` (see `.env.example`); `docker-compose.yml` sets t
 | `AOM_URL`, `AOM_AGENT_API_KEY` | — | Assistant agent identity, written by `register_with_aom.py` |
 | `AOM_SPECIALIST_AGENT_KEYS` | — | JSON map of specialist agent id → key; a specialist without a key runs as the assistant, without memory |
 | `AOM_ADMIN_USERNAME`, `AOM_ADMIN_PASSWORD` | — | Used to publish KB documents |
-| `AOM_LLM_PROVIDER`, `AOM_LLM_MODEL` | AOM default | Pin the model completions use |
-| `RAG_APP_ID`, `RAG_APP_ID_WELLNESS` | `insurance-assistant`, `insurance-wellness` | AOM RAG Application ids |
+| `AOM_LLM_PROVIDER`, `AOM_LLM_MODEL` | Couchbase Labs Agent Operations Manager default | Pin the model completions use |
+| `RAG_APP_ID`, `RAG_APP_ID_WELLNESS` | `insurance-assistant`, `insurance-wellness` | Couchbase Labs Agent Operations Manager RAG Application ids |
 | `KB_PROFILE_LIMIT` | `150` | How many people get a KB profile document |
 | `EXPORT_DIR`, `EXPORT_POLL_SECONDS` | `data/insurance-export`, `600` | Where the nightly export lands and how often to look |
 | `DEMO_TODAY` | the export date | The demo's notion of today |
@@ -293,22 +293,22 @@ cd backend && pip install -r requirements.txt && pytest -q    # 34 tests
 cd mobile && npm run typecheck
 ```
 
-`test_demo_flows.py` covers the eight use cases across the three personas, the members-only gate, the context cache (hit, then invalidation after a change), the offline request flow, business-rule failures and push authorization. `test_aom_integration.py` and `test_aom_bootstrap.py` run the backend against `tests/fake_aom.py`, which has the same routes and shapes as AOM: KB publishing, both RAG applications and their scopes, the shared LLM cache, tool calls over real MCP, the approval tier and the specialist agents with memory.
+`test_demo_flows.py` covers the eight use cases across the three personas, the members-only gate, the context cache (hit, then invalidation after a change), the offline request flow, business-rule failures and push authorization. `test_aom_integration.py` and `test_aom_bootstrap.py` run the backend against `tests/fake_aom.py`, which has the same routes and shapes as Couchbase Labs Agent Operations Manager: KB publishing, both RAG applications and their scopes, the shared LLM cache, tool calls over real MCP, the approval tier and the specialist agents with memory.
 
 ## Repository layout
 
 ```
 backend/            FastAPI API, MCP server, loader, worker, assistant (Python)
   app/catalog.py          Harborline reference data: lines, coverages, claims, roadside, telematics, plans, on-demand products
-  app/assistant.py        intent → members gate → AOM RAG app (shared) | Context Cache → KB + memory + LLM cache (personal) → actions
+  app/assistant.py        intent → members gate → Couchbase Labs Agent Operations Manager RAG app (shared) | Context Cache → KB + memory + LLM cache (personal) → actions
   app/agents.py           the six specialist agents: tool scope, memory recall, governed call, remember the outcome
   app/actions.py          business logic behind all 28 tools
   app/personalization.py  For You cards per customer
   app/knowledge.py        Help Center, Member Care Guide and profile documents for the Knowledge Base
-  app/rag_app.py          the two AOM RAG Application definitions
-  app/loader.py           nightly export → Couchbase + AOM Knowledge Base
+  app/rag_app.py          the two Couchbase Labs Agent Operations Manager RAG Application definitions
+  app/loader.py           nightly export → Couchbase + Couchbase Labs Agent Operations Manager Knowledge Base
   app/sources.py          systems of record: live profile lookup and CMS, mock or live
-  app/worker.py           offline-first requests → the owning agent → AOM tools/invoke
+  app/worker.py           offline-first requests → the owning agent → Couchbase Labs Agent Operations Manager tools/invoke
   app/workload.py         company workload;  app/demo_reset.py  reset;  app/aom_bootstrap.py  self-registration
 mobile/             Expo app (Couchbase Lite engine + browser preview engine)
   app/(tabs)/             Chat, For You, Activity, Profile

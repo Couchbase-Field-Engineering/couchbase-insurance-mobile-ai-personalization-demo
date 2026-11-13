@@ -59,7 +59,7 @@ function llmLabel(m: ChatMessage): { label: string; tone: Tone } | null {
   if (s === 'hit_exact') return { label: 'LLM cache · exact hit', tone: 'ok' };
   if (s === 'hit_semantic') return { label: `LLM cache · semantic hit${m.llm?.similarity ? ` ${m.llm.similarity.toFixed(2)}` : ''}`, tone: 'ok' };
   if (s === 'miss') return { label: `LLM cache · miss${m.llm?.latency_ms ? ` · ${Math.round(m.llm.latency_ms)}ms` : ''}`, tone: 'neutral' };
-  if (s === 'local') return { label: 'Composed from context (AOM not configured)', tone: 'neutral' };
+  if (s === 'local') return { label: 'Composed from context (Couchbase Labs Agent Operations Manager not configured)', tone: 'neutral' };
   if (s === 'bypass') return { label: 'LLM cache · bypassed', tone: 'neutral' };
   return { label: `LLM · ${s}`, tone: 'warn' };
 }
@@ -104,7 +104,7 @@ export default function Chat() {
           <Wordmark height={18} />
           <SyncBadge sync={sync} dark />
         </View>
-        <Text style={styles.subtitle}>One assistant, seven agents: cards, claims, roadside, billing, DriveWell, wellness, cover · governed by Couchbase AOM</Text>
+        <Text style={styles.subtitle}>One assistant, seven agents: cards, claims, roadside, billing, DriveWell, wellness, cover · governed by Couchbase Labs Agent Operations Manager</Text>
       </View>
 
       <ScrollView ref={scroll} style={{ flex: 1 }} contentContainerStyle={styles.list}>

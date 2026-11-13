@@ -206,7 +206,7 @@ export type ActionRequest = {
   charge_usd?: number;
   governed?: boolean;
   trace_id?: string | null;
-  /** AOM agent identity that ran it: the assistant, or the specialist that owns the use case. */
+  /** Couchbase Labs Agent Operations Manager agent identity that ran it: the assistant, or the specialist that owns the use case. */
   agent?: string;
   memories_recalled?: number;
   remembered?: boolean;

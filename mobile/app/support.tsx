@@ -21,7 +21,7 @@ const CHANNEL: Record<string, string> = { chat: 'Chat', callback: 'Call me back'
  * updating personal details, requesting a policy or document change, and
  * bringing in a licensed human agent with the conversation attached. The
  * Harborline Assistant runs these itself. A change to who or what is covered
- * (a driver, a vehicle, a deductible) is held in AOM for an underwriter.
+ * (a driver, a vehicle, a deductible) is held in Couchbase Labs Agent Operations Manager for an underwriter.
  */
 function SupportScreen() {
   const params = useLocalSearchParams<{ tab?: string; topic?: string }>();
@@ -117,7 +117,7 @@ function SupportScreen() {
               <Button label={ch ? `Request: ${ch.name.toLowerCase()}` : 'Choose a change'} icon="send" disabled={!ch || !pol || details.trim().length < 5}
                 onPress={() => ch && pol && void send(ch.approval ? 'request_coverage_change' : 'request_policy_change', { policy_id: pol.policy_id, change: ch.id, details: details.trim() }, `${ch.name} · ${pol.policy_id}`)} />
             </View>
-            <Text style={form.tiny}>{ch?.approval ? 'This changes who or what is covered, so an underwriter approves it in Couchbase AOM before it applies.' : OFFLINE_NOTE}</Text>
+            <Text style={form.tiny}>{ch?.approval ? 'This changes who or what is covered, so an underwriter approves it in Couchbase Labs Agent Operations Manager before it applies.' : OFFLINE_NOTE}</Text>
           </>
         )
       ) : waiting ? (

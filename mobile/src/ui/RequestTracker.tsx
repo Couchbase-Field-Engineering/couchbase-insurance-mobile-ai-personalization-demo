@@ -5,7 +5,7 @@ import { useData } from '../data/DataContext';
 import { theme } from '../theme';
 import { Button, Card, Pill, STATUS_UI } from './components';
 
-/** The AOM agent identity that runs each tool - mirrors backend/app/agents.py. */
+/** The Couchbase Labs Agent Operations Manager agent identity that runs each tool - mirrors backend/app/agents.py. */
 export const AGENT_OF_TOOL: Record<string, string> = {
   file_claim: 'insurance-claims-agent', add_claim_evidence: 'insurance-claims-agent',
   request_roadside: 'insurance-roadside-agent', send_sos: 'insurance-roadside-agent',
@@ -31,7 +31,7 @@ const APPROVER: Record<string, string> = {
 
 /**
  * Live status of one offline-first request, read from the local database:
- * "On device" -> pushed -> processed by the backend through AOM -> synced back.
+ * "On device" -> pushed -> processed by the backend through Couchbase Labs Agent Operations Manager -> synced back.
  */
 export function RequestTracker({ id, onRetry, retryLabel = 'Try again' }: { id: string; onRetry?: () => void; retryLabel?: string }) {
   const { snap, sync } = useData();
@@ -41,15 +41,15 @@ export function RequestTracker({ id, onRetry, retryLabel = 'Try again' }: { id: 
   const waiting = q._local || q.status === 'pending' || q.status === 'processing';
   const agent = agentOf(q);
   const specialist = agent !== 'insurance-assistant';
-  const agentLabel = `Run by the ${AGENT_NAME[agent] ?? agent} through Couchbase AOM`;
+  const agentLabel = `Run by the ${AGENT_NAME[agent] ?? agent} through Couchbase Labs Agent Operations Manager`;
   const steps = [
     { label: 'Saved in Couchbase Lite on your phone', done: true },
     { label: sync.status === 'paused' || sync.status === 'offline' ? 'Waiting for a connection…' : 'Synced to Couchbase Server', done: !q._local },
-    { label: q.governed === false ? 'Processed (AOM not configured - ungoverned)' : agentLabel, done: !waiting },
+    { label: q.governed === false ? 'Processed (Couchbase Labs Agent Operations Manager not configured - ungoverned)' : agentLabel, done: !waiting },
     ...(specialist && q.governed !== false
-      ? [{ label: q.remembered ? `Remembered in AOM Agent Memory${q.memories_recalled ? ` · recalled ${q.memories_recalled} earlier` : ''}` : 'Saving the outcome to AOM Agent Memory', done: !waiting && !!q.remembered }]
+      ? [{ label: q.remembered ? `Remembered in Couchbase Labs Agent Operations Manager Agent Memory${q.memories_recalled ? ` · recalled ${q.memories_recalled} earlier` : ''}` : 'Saving the outcome to Couchbase Labs Agent Operations Manager Agent Memory', done: !waiting && !!q.remembered }]
       : []),
-    { label: q.status === 'awaiting_approval' ? `Waiting for ${APPROVER[q.tool] ?? 'an approver'} in AOM` : 'Result synced back to your phone', done: !waiting && q.status !== 'awaiting_approval' },
+    { label: q.status === 'awaiting_approval' ? `Waiting for ${APPROVER[q.tool] ?? 'an approver'} in Couchbase Labs Agent Operations Manager` : 'Result synced back to your phone', done: !waiting && q.status !== 'awaiting_approval' },
   ];
   return (
     <Card style={{ padding: 16, gap: 12, marginTop: 16 }}>
@@ -70,7 +70,7 @@ export function RequestTracker({ id, onRetry, retryLabel = 'Try again' }: { id: 
         </View>
       ))}
       {q.summary ? <Text style={[styles.summary, q.status === 'failed' && { color: theme.color.danger }]}>{q.summary}</Text> : null}
-      {q.governed ? <Text style={styles.tiny}>Governed by Agent Operations Manager{q.trace_id ? ` · trace ${q.trace_id}` : ''}</Text> : null}
+      {q.governed ? <Text style={styles.tiny}>Governed by Couchbase Labs Agent Operations Manager{q.trace_id ? ` · trace ${q.trace_id}` : ''}</Text> : null}
       {q.status === 'failed' && onRetry ? <Button label={retryLabel} icon="refresh" onPress={onRetry} /> : null}
       <Button
         label={waiting ? 'Done - it will finish in the background' : 'Done'}

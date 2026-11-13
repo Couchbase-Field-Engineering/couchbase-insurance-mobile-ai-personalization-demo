@@ -94,12 +94,12 @@ export default function Profile() {
         </View>
       </Card>
 
-      <SectionTitle title="Agent Operations Manager" />
+      <SectionTitle title="Couchbase Labs Agent Operations Manager" />
       <Card style={{ padding: 16, gap: 8 }}>
         <Text style={styles.meta}>
-          Everything you confirm here becomes a request that a specialist agent runs through Couchbase AOM - Claims, Roadside, Billing, DriveWell,
+          Everything you confirm here becomes a request that a specialist agent runs through Couchbase Labs Agent Operations Manager - Claims, Roadside, Billing, DriveWell,
           Wellness or Coverage - each limited to its own tools, with Agent Memory, a trace and an audit entry. Late-fee waivers wait for a billing
-          supervisor and coverage changes for an underwriter. Answers use AOM's Knowledge Base, Context Cache and LLM Cache.
+          supervisor and coverage changes for an underwriter. Answers use Couchbase Labs Agent Operations Manager's Knowledge Base, Context Cache and LLM Cache.
         </Text>
         <Field icon="link-outline" label="Backend" value={API_URL} />
         <Field icon="finger-print-outline" label="User ID" value={session?.user_id ?? '—'} />

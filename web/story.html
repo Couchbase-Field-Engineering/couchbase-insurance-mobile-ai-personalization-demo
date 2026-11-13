@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Couchbase Harborline · Insurance that knows you, even with no signal</title>
-<meta name="description" content="How Couchbase and the Agent Operations Manager run an insurance mobile app with seven governed AI agents - personalized, offline-capable and without a model call per question.">
+<meta name="description" content="How Couchbase and the Couchbase Labs Agent Operations Manager run an insurance mobile app with seven governed AI agents - personalized, offline-capable and without a model call per question.">
 <style>
 :root{--bg:#f7f7f7;--panel:#fff;--panel2:#fff0da;--line:#d2d5d9;--fg:#000;--fg2:#333;--muted:#5c5c5c;--navy:#000;--head:#000;--gold:#ec1218;--gold2:#b30005;--ocean:#fc9d0c;--aqua:#fff0da;--cb:#ec1218;--cb2:#b30005;--green:#0b7a2b;--amber:#a65f00;--shadow:0 0 32px rgba(0,0,0,.08);--display:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
 html[data-theme=dark]{--bg:#000;--panel:#141414;--panel2:#1f1f1f;--line:#333;--fg:#fff;--fg2:#d2d5d9;--muted:#9b9382;--head:#fff;--gold2:#ff5a5e;--cb2:#ff5a5e;--green:#21ea2a;--amber:#fc9d0c;--shadow:0 0 32px rgba(0,0,0,.5)}
@@ -114,7 +114,7 @@ table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:
 <main id="main">
 
 <!-- 0 -->
-<section class="ch hero" data-notes="Open on the title. The claim for the next few minutes: an insurance app is used at the worst moments - a breakdown, an accident, a bill that is late - and those are the moments with the least signal and the least patience.|So the app has to know the customer, work from the phone, and act in one tap. And it has to do that without calling a model for every question.|The Agent Operations Manager is where the AI runs: every answer goes through its Context Cache and LLM Cache, is grounded by a scoped Knowledge Base, and every action is a governed, audited tool call made by the agent that owns that part of the business.|Where it ends: the live app, signed in as a policyholder, a health and pet member and an on-demand customer, next to AOM's own pages.">
+<section class="ch hero" data-notes="Open on the title. The claim for the next few minutes: an insurance app is used at the worst moments - a breakdown, an accident, a bill that is late - and those are the moments with the least signal and the least patience.|So the app has to know the customer, work from the phone, and act in one tap. And it has to do that without calling a model for every question.|The Couchbase Labs Agent Operations Manager is where the AI runs: every answer goes through its Context Cache and LLM Cache, is grounded by a scoped Knowledge Base, and every action is a governed, audited tool call made by the agent that owns that part of the business.|Where it ends: the live app, signed in as a policyholder, a health and pet member and an on-demand customer, next to Couchbase Labs Agent Operations Manager's own pages.">
   <div class="wrap">
     <div class="kicker">Couchbase Harborline · Insurance mobile AI personalization · Live demo</div>
     <h1>Insurance that knows you. <span class="accent">Even with no signal.</span></h1>
@@ -125,7 +125,7 @@ table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:
 </section>
 
 <!-- 1 -->
-<section class="ch alt" data-notes="The eight things customers actually use an insurance app for. Read them as a day in the life: the card in your pocket, the accident, the tow, the bill, the driving score, the question, the doctor, the weekend trip.|Each one is a screen in the app and a set of tools on one MCP server. Six of them have their own agent in AOM, with its own identity, its own tool scope and its own memory; the assistant handles the other two itself.|In the demo each kind of customer has a person: Maya has auto and home, Daniel has health and pet plans, Sofia has no annual policy at all and buys cover by the day.|The point of one app is not one prompt. It is one data plane: one place the profiles, the knowledge, the caches, the memory and the audit trail live.">
+<section class="ch alt" data-notes="The eight things customers actually use an insurance app for. Read them as a day in the life: the card in your pocket, the accident, the tow, the bill, the driving score, the question, the doctor, the weekend trip.|Each one is a screen in the app and a set of tools on one MCP server. Six of them have their own agent in Couchbase Labs Agent Operations Manager, with its own identity, its own tool scope and its own memory; the assistant handles the other two itself.|In the demo each kind of customer has a person: Maya has auto and home, Daniel has health and pet plans, Sofia has no annual policy at all and buys cover by the day.|The point of one app is not one prompt. It is one data plane: one place the profiles, the knowledge, the caches, the memory and the audit trail live.">
   <div class="wrap">
     <div class="kicker">Chapter 1 · The brief</div>
     <h2>Eight jobs. <span class="accent">One app, seven agents.</span></h2>
@@ -144,7 +144,7 @@ table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:
 </section>
 
 <!-- 2 -->
-<section class="ch" data-notes="This is where an AI-powered insurance app goes wrong. Two of the four are cost: tokens in, tokens out, per question - and the prompt for a personal question about a policy is big. The third is the one that gets a project cancelled: the assistant telling someone about a health benefit they do not have, or acting on a policy it should not touch. The fourth is specific to insurance: the moment the customer needs you most is the moment they have no signal.|The top row is the problems. The bottom row is what AOM and Couchbase do about each one. Everything on this slide is running in the live demo.|The one most teams miss is the last column: an ID card or an answer served from the phone costs nothing, and a tow request written on the hard shoulder still arrives - but only if the data is a document that syncs.">
+<section class="ch" data-notes="This is where an AI-powered insurance app goes wrong. Two of the four are cost: tokens in, tokens out, per question - and the prompt for a personal question about a policy is big. The third is the one that gets a project cancelled: the assistant telling someone about a health benefit they do not have, or acting on a policy it should not touch. The fourth is specific to insurance: the moment the customer needs you most is the moment they have no signal.|The top row is the problems. The bottom row is what Couchbase Labs Agent Operations Manager and Couchbase do about each one. Everything on this slide is running in the live demo.|The one most teams miss is the last column: an ID card or an answer served from the phone costs nothing, and a tow request written on the hard shoulder still arrives - but only if the data is a document that syncs.">
   <div class="wrap">
     <div class="kicker">Chapter 2 · What goes wrong</div>
     <h2>Four things break an AI insurance app. <span class="accent">Each one has a fix.</span></h2>
@@ -163,11 +163,11 @@ table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:
 </section>
 
 <!-- 3 -->
-<section class="ch alt" data-notes="How this usually gets built: a vector database per line of business, a semantic cache, a session store, a primary database, an LLM gateway, an agent framework with its own memory store, and a sync layer the app team writes. Every grey box is a bill and an integration; every red one is code to own.|Press Transform. Couchbase Server is the document store, the vector index and the memory-first cache; AOM is the gateway, the caches, the knowledge base, agent memory and the governance; Couchbase Lite and Sync Gateway carry the policies and the cached context to the phone, by channel.|The cost argument is not only tokens: it is the number of systems between the question and the answer.">
+<section class="ch alt" data-notes="How this usually gets built: a vector database per line of business, a semantic cache, a session store, a primary database, an LLM gateway, an agent framework with its own memory store, and a sync layer the app team writes. Every grey box is a bill and an integration; every red one is code to own.|Press Transform. Couchbase Server is the document store, the vector index and the memory-first cache; Couchbase Labs Agent Operations Manager is the gateway, the caches, the knowledge base, agent memory and the governance; Couchbase Lite and Sync Gateway carry the policies and the cached context to the phone, by channel.|The cost argument is not only tokens: it is the number of systems between the question and the answer.">
   <div class="wrap">
     <div class="kicker">Chapter 3 · How it usually gets built</div>
     <h2>Every box between the question and the answer <span class="accent">is a bill</span>.</h2>
-    <p class="lede">The usual AI stack spreads one conversation over half a dozen services and a sync layer the app team builds - then repeats it per line of business. Press <b>Transform</b> to see what one Couchbase data plane and the Agent Operations Manager replace.</p>
+    <p class="lede">The usual AI stack spreads one conversation over half a dozen services and a sync layer the app team builds - then repeats it per line of business. Press <b>Transform</b> to see what one Couchbase data plane and the Couchbase Labs Agent Operations Manager replace.</p>
     <div class="diagram">
       <div class="head"><span id="diagHint">Grey dashed boxes are separate services to license, run and keep consistent. Red dashed is code your team writes and maintains.</span><button class="btn primary sm" id="transform">↻ Transform the stack</button></div>
       <svg id="diag" viewBox="0 0 1140 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stack comparison">
@@ -193,7 +193,7 @@ table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:
           <rect x="26" y="236" width="130" height="64" rx="10" class="scb"/><text x="91" y="262" text-anchor="middle" class="scbt">Couchbase Lite</text><text x="91" y="280" text-anchor="middle" class="scbs">ID cards · cached context</text>
           <rect x="250" y="160" width="190" height="120" rx="14" class="scb"/><text x="345" y="196" text-anchor="middle" class="scbt">Sync Gateway</text><text x="345" y="216" text-anchor="middle" class="scbs">delta sync, both ways</text><text x="345" y="234" text-anchor="middle" class="scbs">channels: user · catalog · members</text><text x="345" y="252" text-anchor="middle" class="scbs">member guide stays with members</text>
           <rect x="520" y="110" width="260" height="220" rx="16" class="scb"/><text x="650" y="146" text-anchor="middle" class="scbt">Couchbase Server</text><text x="650" y="168" text-anchor="middle" class="scbs">memory-first JSON + key-value</text><text x="650" y="186" text-anchor="middle" class="scbs">SQL++ · indexes · vector search</text><text x="650" y="204" text-anchor="middle" class="scbs">system of engagement and cache</text>
-          <rect x="545" y="230" width="210" height="80" rx="12" fill="#fff" stroke="#fc9d0c" stroke-width="2"/><text x="650" y="258" text-anchor="middle" style="fill:#000;font-size:12.5px;font-weight:800">Agent Operations Manager</text><text x="650" y="276" text-anchor="middle" style="fill:#333;font-size:10.5px">LLM Cache · Context Cache · Agent Memory</text><text x="650" y="292" text-anchor="middle" style="fill:#333;font-size:10.5px">Knowledge Base · 7 agents · governance</text>
+          <rect x="545" y="230" width="210" height="80" rx="12" fill="#fff" stroke="#fc9d0c" stroke-width="2"/><text x="650" y="258" text-anchor="middle" style="fill:#000;font-size:12.5px;font-weight:800">Couchbase Labs Agent Operations Manager</text><text x="650" y="276" text-anchor="middle" style="fill:#333;font-size:10.5px">LLM Cache · Context Cache · Agent Memory</text><text x="650" y="292" text-anchor="middle" style="fill:#333;font-size:10.5px">Knowledge Base · 7 agents · governance</text>
           <path d="M166 270 L250 230 M440 220 L520 220 M780 220 L964 220" class="sline" style="opacity:.9;stroke-width:2"/>
           <text x="208" y="236" text-anchor="middle" class="ss">sync</text><text x="872" y="210" text-anchor="middle" class="ss">nightly export · live lookup</text>
           <text x="91" y="352" text-anchor="middle" class="ss" fill="#0b7a2b">offline: card, answers, queued help</text>
@@ -205,24 +205,24 @@ table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:
 </section>
 
 <!-- 4 -->
-<section class="ch" data-notes="Walk the same five moments through two apps. Press Next for each step. The tally at the bottom of each phone is the running LLM spend.|Left is Harborline on AOM: the first shared answer is generated once; Daniel's identical question is an LLM-cache hit; Maya's claim question builds context once and the follow-up reuses it; on the roadside with no signal, the phone answers from Couchbase Lite and queues the tow.|Right is a plain chatbot app: every question is a full-price model call with the whole prompt rebuilt, and offline it has nothing to say.|The dollar figures are illustrative - about 2,000 tokens per generated answer at a blended $4 per million. The ratio is the point, not the cents.">
+<section class="ch" data-notes="Walk the same five moments through two apps. Press Next for each step. The tally at the bottom of each phone is the running LLM spend.|Left is Harborline on Couchbase Labs Agent Operations Manager: the first shared answer is generated once; Daniel's identical question is an LLM-cache hit; Maya's claim question builds context once and the follow-up reuses it; on the roadside with no signal, the phone answers from Couchbase Lite and queues the tow.|Right is a plain chatbot app: every question is a full-price model call with the whole prompt rebuilt, and offline it has nothing to say.|The dollar figures are illustrative - about 2,000 tokens per generated answer at a blended $4 per million. The ratio is the point, not the cents.">
   <div class="wrap">
     <div class="kicker">Chapter 4 · The same questions, two bills</div>
     <h2>Five questions: <span class="accent">three model calls instead of five</span>, and help with no signal.</h2>
-    <p class="lede">The same people ask the same things of two insurance apps: one that runs through the Agent Operations Manager with its data on the phone, and one that calls the model every time.</p>
+    <p class="lede">The same people ask the same things of two insurance apps: one that runs through the Couchbase Labs Agent Operations Manager with its data on the phone, and one that calls the model every time.</p>
     <div class="sim">
       <div>
         <div class="steps" id="steps">
-          <div class="step"><div class="n">1</div><div><h4>Maya: "How do I file a claim?"</h4><p>A shared question. <b>AOM:</b> the customer RAG app retrieves the scoped Help Center, generates once, and caches the answer. <b>Plain chatbot:</b> generates.</p></div></div>
-          <div class="step"><div class="n">2</div><div><h4>Daniel asks the same thing</h4><p><b>AOM:</b> LLM Cache exact hit - no tokens, no latency. Shared answers carry no personal data, so sharing is safe. <b>Plain chatbot:</b> generates again.</p></div></div>
-          <div class="step"><div class="n">3</div><div><h4>Maya: "What's the status of my claim?"</h4><p>A personal question. <b>AOM:</b> builds her context once (her policy administration record, her profile document, live claim data), stores it in the Context Cache and in Couchbase, then generates. <b>Plain chatbot:</b> rebuilds the whole prompt and generates.</p></div></div>
-          <div class="step"><div class="n">4</div><div><h4>Maya: "How much will I get paid?"</h4><p><b>AOM:</b> Context Cache hit - a short call on the cached context, with memory of the earlier turn. <b>Plain chatbot:</b> the full prompt again, plus the history.</p></div></div>
-          <div class="step"><div class="n">5</div><div><h4>On a back road, no signal: "I have a flat tire"</h4><p><b>AOM:</b> her policy, roadside plan and last location are already on her phone; Couchbase Lite answers and queues the tow for the Roadside Agent. <b>Plain chatbot:</b> can't reach the server.</p></div></div>
+          <div class="step"><div class="n">1</div><div><h4>Maya: "How do I file a claim?"</h4><p>A shared question. <b>Couchbase Labs Agent Operations Manager:</b> the customer RAG app retrieves the scoped Help Center, generates once, and caches the answer. <b>Plain chatbot:</b> generates.</p></div></div>
+          <div class="step"><div class="n">2</div><div><h4>Daniel asks the same thing</h4><p><b>Couchbase Labs Agent Operations Manager:</b> LLM Cache exact hit - no tokens, no latency. Shared answers carry no personal data, so sharing is safe. <b>Plain chatbot:</b> generates again.</p></div></div>
+          <div class="step"><div class="n">3</div><div><h4>Maya: "What's the status of my claim?"</h4><p>A personal question. <b>Couchbase Labs Agent Operations Manager:</b> builds her context once (her policy administration record, her profile document, live claim data), stores it in the Context Cache and in Couchbase, then generates. <b>Plain chatbot:</b> rebuilds the whole prompt and generates.</p></div></div>
+          <div class="step"><div class="n">4</div><div><h4>Maya: "How much will I get paid?"</h4><p><b>Couchbase Labs Agent Operations Manager:</b> Context Cache hit - a short call on the cached context, with memory of the earlier turn. <b>Plain chatbot:</b> the full prompt again, plus the history.</p></div></div>
+          <div class="step"><div class="n">5</div><div><h4>On a back road, no signal: "I have a flat tire"</h4><p><b>Couchbase Labs Agent Operations Manager:</b> her policy, roadside plan and last location are already on her phone; Couchbase Lite answers and queues the tow for the Roadside Agent. <b>Plain chatbot:</b> can't reach the server.</p></div></div>
         </div>
         <div class="simctl"><button class="btn primary" id="simNext">Next step →</button><button class="btn" id="simReset">Start over</button></div>
       </div>
       <div><div class="phone"><div class="screen">
-        <div class="ph-top"><div class="ph-sb"><span>8:12</span><span id="cbSig">●●● Wi-Fi</span></div><div class="ph-title">Harborline</div><div class="ph-sub">Governed by Couchbase AOM</div></div>
+        <div class="ph-top"><div class="ph-sb"><span>8:12</span><span id="cbSig">●●● Wi-Fi</span></div><div class="ph-title">Harborline</div><div class="ph-sub">Governed by Couchbase Labs Agent Operations Manager</div></div>
         <div class="ph-body" id="cbBody"></div></div></div><p class="ph-label">With Couchbase AIDP</p></div>
       <div><div class="phone"><div class="screen">
         <div class="ph-top" style="background:#5c5c5c"><div class="ph-sb"><span>8:12</span><span id="rdSig">●●● Wi-Fi</span></div><div class="ph-title">Insurance chat</div><div class="ph-sub">Plain LLM chatbot</div></div>
@@ -232,7 +232,7 @@ table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:
 </section>
 
 <!-- 5 -->
-<section class="ch alt" data-notes="Follow the data left to right: the nightly export of policyholders, members and on-demand customers lands in Couchbase; the Help Center and Member Care Guide are republished to the Knowledge Base as two documents; Harborline is two registered RAG applications and seven agents in AOM.|The context cache is the one to dwell on: the context assembled for Maya's claim question is cached in AOM, and the same document syncs to her phone. That is why Harborline can still answer offline, for free.|The numbers on this page are live from the running demo: cache hit rates, the model calls avoided since the backend started, and how the questions split across the eight jobs. AOM's own RAG Applications page keeps the durable view.">
+<section class="ch alt" data-notes="Follow the data left to right: the nightly export of policyholders, members and on-demand customers lands in Couchbase; the Help Center and Member Care Guide are republished to the Knowledge Base as two documents; Harborline is two registered RAG applications and seven agents in Couchbase Labs Agent Operations Manager.|The context cache is the one to dwell on: the context assembled for Maya's claim question is cached in Couchbase Labs Agent Operations Manager, and the same document syncs to her phone. That is why Harborline can still answer offline, for free.|The numbers on this page are live from the running demo: cache hit rates, the model calls avoided since the backend started, and how the questions split across the eight jobs. Couchbase Labs Agent Operations Manager's own RAG Applications page keeps the durable view.">
   <div class="wrap">
     <div class="kicker">Chapter 5 · One data plane for the AI</div>
     <h2>Build the context once. <span class="accent">Reuse it everywhere</span> - including the phone.</h2>
@@ -240,13 +240,13 @@ table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:
     <div class="flow">
       <div class="card"><span class="icon">🗂️</span><h3>Systems of record</h3><p>Every night an export lands: one row per customer with policies, billing, claims, telematics, plans, segments and propensity scores. During the day a live lookup supplies the current record when a context is built.</p></div>
       <div class="card"><span class="icon">🗄️</span><h3>Couchbase Server</h3><p>Profiles upserted, feeds ranked and re-ranked after every action, the request queue, telehealth appointments, and the things people do in chat.</p></div>
-      <div class="card"><span class="icon">📚</span><h3>AOM Knowledge Base</h3><p>Today's Help Center and Member Care Guide plus a profile per person. Two RAG apps, one per knowledge document; personal retrieval scoped to the asker.</p></div>
+      <div class="card"><span class="icon">📚</span><h3>Couchbase Labs Agent Operations Manager Knowledge Base</h3><p>Today's Help Center and Member Care Guide plus a profile per person. Two RAG apps, one per knowledge document; personal retrieval scoped to the asker.</p></div>
       <div class="card"><span class="icon">⚡</span><h3>Caches &amp; agent memory</h3><p>Context per person and topic, assembled once and invalidated by the next export or any action. Shared answers reused across people. Each specialist agent remembers what it did for this customer.</p></div>
       <div class="card"><span class="icon">📱</span><h3>On the phone</h3><p>Policies, ID cards, the feed and the same context document sync through Sync Gateway on the person's own channel, so the app works offline at no cost.</p></div>
     </div>
     <div class="stats">
       <div class="stat"><div class="k">Harborline answers</div><div class="v" id="m_turns">-</div><div class="d" id="m_turnsd">since the backend started</div></div>
-      <div class="stat"><div class="k">LLM cache</div><div class="v" id="m_llm">-</div><div class="d" id="m_llmd">of model calls answered from AOM's LLM Cache</div></div>
+      <div class="stat"><div class="k">LLM cache</div><div class="v" id="m_llm">-</div><div class="d" id="m_llmd">of model calls answered from Couchbase Labs Agent Operations Manager's LLM Cache</div></div>
       <div class="stat"><div class="k">Context cache</div><div class="v" id="m_ctx">-</div><div class="d" id="m_ctxd">of personal questions reused cached context</div></div>
       <div class="stat"><div class="k">Model calls avoided</div><div class="v" id="m_saved">-</div><div class="d" id="m_savedd">cache hits plus answers served on the phone</div></div>
     </div>
@@ -267,10 +267,10 @@ table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:
 </section>
 
 <!-- 6 -->
-<section class="ch" data-notes="The summary table. Read it by rows: each kind of moment, what it costs with a model call every time, what it costs through AOM.|The first two rows are the LLM cache: every customer shares one generated answer per shared question, per knowledge version.|Rows three and four are the context cache: build once per person and topic, invalidate on new data. Row five is Couchbase Lite: zero, and the request still gets through. Row six is the members-only row: who may hear what. Row seven is governance - each agent can only use its own tools, AOM caps what any agent can spend, and it holds the sensitive actions for a person.">
+<section class="ch" data-notes="The summary table. Read it by rows: each kind of moment, what it costs with a model call every time, what it costs through Couchbase Labs Agent Operations Manager.|The first two rows are the LLM cache: every customer shares one generated answer per shared question, per knowledge version.|Rows three and four are the context cache: build once per person and topic, invalidate on new data. Row five is Couchbase Lite: zero, and the request still gets through. Row six is the members-only row: who may hear what. Row seven is governance - each agent can only use its own tools, Couchbase Labs Agent Operations Manager caps what any agent can spend, and it holds the sensitive actions for a person.">
   <div class="wrap">
     <div class="kicker">Chapter 6 · Where the savings come from</div>
-    <h2>Question by question, <span class="accent">with and without AOM</span>.</h2>
+    <h2>Question by question, <span class="accent">with and without Couchbase Labs Agent Operations Manager</span>.</h2>
     <p class="lede">Illustrative per-answer costs for the questions in chapter 4. The ratio is what matters: most of an insurance app's traffic is in the cheap rows.</p>
     <table class="cmp">
       <thead><tr><th>Moment</th><th>With Couchbase AIDP</th><th>A model call every time</th></tr></thead>
@@ -278,43 +278,43 @@ table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:
         <tr><td>Shared question, first time today</td><td><span class="p">~</span>One generated answer from a scoped RAG app: a small prompt (that knowledge document's chunks only), then cached in the LLM Cache.<small>≈ 1,500 tokens</small></td><td><span class="x">✗</span>Generated, with whatever the retriever found across the whole store.<small>≈ 2,000-4,000 tokens</small></td></tr>
         <tr><td>Same shared question, anyone else</td><td><span class="y">✓</span>LLM Cache exact hit; a reworded version is a semantic hit. Zero tokens, zero latency.<small>0 tokens</small></td><td><span class="x">✗</span>Generated again, for every person, every time.<small>≈ 2,000-4,000 tokens</small></td></tr>
         <tr><td>Personal question, first time</td><td><span class="p">~</span>Context built once: this person's source record, their KB profile, knowledge chunks and live tool facts, stored in the Context Cache and in Couchbase.<small>≈ 2,000 tokens</small></td><td><span class="x">✗</span>Policy, claim and history concatenated into the prompt by application code.<small>≈ 3,000-6,000 tokens</small></td></tr>
-        <tr><td>Follow-up on the same topic</td><td><span class="y">✓</span>Context Cache hit plus AOM Agent Memory (what the person said, and what the Claims or Roadside Agent did): a short call on cached context. Invalidated only by a new export or an action.<small>≈ 600 tokens</small></td><td><span class="x">✗</span>The full prompt again, now with the chat history appended.<small>grows every turn</small></td></tr>
+        <tr><td>Follow-up on the same topic</td><td><span class="y">✓</span>Context Cache hit plus Couchbase Labs Agent Operations Manager Agent Memory (what the person said, and what the Claims or Roadside Agent did): a short call on cached context. Invalidated only by a new export or an action.<small>≈ 600 tokens</small></td><td><span class="x">✗</span>The full prompt again, now with the chat history appended.<small>grows every turn</small></td></tr>
         <tr><td>Anything with no signal</td><td><span class="y">✓</span>The ID card opens, the assistant answers from the profile, cached context and FAQ in Couchbase Lite; the claim, the tow or the SOS queues and syncs later.<small>0 tokens, no network</small></td><td><span class="x">✗</span>No card, no answer; a phone call to a contact center.<small>the hidden cost</small></td></tr>
         <tr><td>An auto customer asks about telehealth</td><td><span class="y">✓</span>The members gate refuses before anything is retrieved; the wellness RAG app and the <code>members</code> sync channel are never in that customer's path, and the Wellness Agent's tools refuse a non-member.<small>0 tokens, nothing leaked</small></td><td><span class="x">✗</span>Depends on a prompt instruction holding - over one shared vector store.</td></tr>
-        <tr><td>Who gets to act, and spend</td><td><span class="y">✓</span>Seven AOM identities, each scoped to its own tools; RBAC, budgets and rate limits, traces with cost per answer, audit, human approval for late-fee waivers and coverage changes.</td><td><span class="p">~</span>A separate gateway and governance product, or one agent that can do everything.</td></tr>
+        <tr><td>Who gets to act, and spend</td><td><span class="y">✓</span>Seven Couchbase Labs Agent Operations Manager identities, each scoped to its own tools; RBAC, budgets and rate limits, traces with cost per answer, audit, human approval for late-fee waivers and coverage changes.</td><td><span class="p">~</span>A separate gateway and governance product, or one agent that can do everything.</td></tr>
       </tbody>
     </table>
-    <p class="src">Token figures are illustrative demo values for an app of this shape; AOM's traces show the real count per answer. Couchbase Lite: <a href="https://docs.couchbase.com/couchbase-lite/current" target="_blank" rel="noopener">documentation</a>.</p>
+    <p class="src">Token figures are illustrative demo values for an app of this shape; Couchbase Labs Agent Operations Manager's traces show the real count per answer. Couchbase Lite: <a href="https://docs.couchbase.com/couchbase-lite/current" target="_blank" rel="noopener">documentation</a>.</p>
   </div>
 </section>
 
 <!-- 7 -->
-<section class="ch alt" data-notes="Hand off to the live app, and open AOM next to it.|Run the script: a shared question as Maya (miss), the same as Daniel (exact hit), a personal question twice (context cache built, then hit), the members-only question an auto customer shouldn't get an answer to, then Profile → Offline mode: open the ID card, ask again (answered on device) and request a tow.|Open AOM's Agents page: seven identities, each with its own tools. Then RAG Applications for insurance-assistant and insurance-wellness, the LLM Cache and Context Cache pages, Agent Memory, the Approvals queue, and a trace for one action.">
+<section class="ch alt" data-notes="Hand off to the live app, and open Couchbase Labs Agent Operations Manager next to it.|Run the script: a shared question as Maya (miss), the same as Daniel (exact hit), a personal question twice (context cache built, then hit), the members-only question an auto customer shouldn't get an answer to, then Profile → Offline mode: open the ID card, ask again (answered on device) and request a tow.|Open Couchbase Labs Agent Operations Manager's Agents page: seven identities, each with its own tools. Then RAG Applications for insurance-assistant and insurance-wellness, the LLM Cache and Context Cache pages, Agent Memory, the Approvals queue, and a trace for one action.">
   <div class="wrap">
     <div class="kicker">See it run</div>
     <h2>Now watch the <span class="accent">meter not move</span>.</h2>
-    <p class="lede">The live demo runs the right-hand side of chapter 3: Couchbase Lite (in the browser preview, the same documents over REST), Sync Gateway, Couchbase Server and the Agent Operations Manager.</p>
+    <p class="lede">The live demo runs the right-hand side of chapter 3: Couchbase Lite (in the browser preview, the same documents over REST), Sync Gateway, Couchbase Server and the Couchbase Labs Agent Operations Manager.</p>
     <div class="grid g3">
       <div class="card"><h3>The Harborline app</h3><p>Sign in as Maya (auto + home), Daniel (health + pet) or Sofia (cover by the day) - each from today's export.</p><a class="btn primary" href="/login" style="margin-top:12px">Open the app →</a></div>
-      <div class="card"><h3>Agent Operations Manager</h3><p>Harborline's seven agents and two RAG applications with their cache hits and savings, the LLM and Context Cache pages, traces with cost per answer, Agent Memory and the approval queue.</p><a class="btn" id="aomLink" target="_blank" rel="noopener" href="#" style="margin-top:12px">Open AOM ↗</a></div>
+      <div class="card"><h3>Couchbase Labs Agent Operations Manager</h3><p>Harborline's seven agents and two RAG applications with their cache hits and savings, the LLM and Context Cache pages, traces with cost per answer, Agent Memory and the approval queue.</p><a class="btn" id="aomLink" target="_blank" rel="noopener" href="#" style="margin-top:12px">Open Couchbase Labs Agent Operations Manager ↗</a></div>
       <div class="card"><h3>The demo, live</h3><p id="liveLine">Checking the backend…</p><a class="btn" href="/api/status" target="_blank" style="margin-top:12px">Backend status ↗</a></div>
     </div>
     <div class="card" style="margin-top:14px"><h3 style="margin-bottom:10px">An eight-minute script</h3>
       <ol class="script">
         <li><span><b>Pay once.</b> Sign in as Maya and ask "How do I file a claim?" The chips show <code>LLM cache · miss</code>: the customer RAG app generated it from the scoped Help Center.</span></li>
-        <li><span><b>Share it.</b> Sign in as Daniel and ask the same thing: <code>LLM cache · exact hit</code>. Reword it: a semantic hit. Open AOM's RAG Applications page - the hit is counted against <code>insurance-assistant</code>.</span></li>
+        <li><span><b>Share it.</b> Sign in as Daniel and ask the same thing: <code>LLM cache · exact hit</code>. Reword it: a semantic hit. Open Couchbase Labs Agent Operations Manager's RAG Applications page - the hit is counted against <code>insurance-assistant</code>.</span></li>
         <li><span><b>Build context once.</b> As Maya: "What's the status of my claim?" shows <code>Context cache · built</code> and the policy administration round trip. Ask how much she will be paid: <code>Context cache · hit</code>. Open <b>sources</b>: her own profile and the Help Center, nothing else.</span></li>
         <li><span><b>Try the wrong door.</b> Still as Maya: "Can I book a telehealth visit?" The <b>Members only</b> gate refuses, and nothing was retrieved. Sign in as Daniel and ask it: answered from the Member Care Guide by <code>insurance-wellness</code>. Profile → Offline &amp; sync shows his <code>members</code> channel.</span></li>
         <li><span><b>Go offline.</b> As Maya, Profile → Offline mode. Open <b>ID cards</b>: still there. Ask "I have a flat tire": <b>Answered on device · Couchbase Lite</b>. Request a flat tire change; it shows "On device".</span></li>
-        <li><span><b>Back online.</b> Turn Offline mode off: the request syncs and the <i>Roadside Agent</i> - its own AOM identity, scoped to three roadside tools - recalls her earlier breakdowns from <b>AOM Agent Memory</b>, dispatches as a governed tool call, and remembers the outcome. For You now leads with the truck's ETA.</span></li>
-        <li><span><b>Ask for an exception.</b> As Daniel, Payments &amp; renewals → request the late-fee waiver. The phone shows <b>Awaiting approval</b>; approve it in AOM → Approvals and it flips to done.</span></li>
+        <li><span><b>Back online.</b> Turn Offline mode off: the request syncs and the <i>Roadside Agent</i> - its own Couchbase Labs Agent Operations Manager identity, scoped to three roadside tools - recalls her earlier breakdowns from <b>Couchbase Labs Agent Operations Manager Agent Memory</b>, dispatches as a governed tool call, and remembers the outcome. For You now leads with the truck's ETA.</span></li>
+        <li><span><b>Ask for an exception.</b> As Daniel, Payments &amp; renewals → request the late-fee waiver. The phone shows <b>Awaiting approval</b>; approve it in Couchbase Labs Agent Operations Manager → Approvals and it flips to done.</span></li>
         <li><span><b>Buy cover in a minute.</b> As Sofia, For You → "Borrowing a Toyota RAV4 tomorrow?" → Activate. The <i>Coverage Agent</i> issues the certificate, it appears under ID cards, and roadside is now included.</span></li>
       </ol>
     </div>
     <div class="card" style="margin-top:14px" id="workloadCard">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
         <div><h3 style="margin-bottom:6px">The whole book of business, at once</h3>
-          <p style="margin:0">Replay a real queue: policyholders from every region, health and pet members and on-demand customers ask Harborline what such people ask - ID cards, claim status, roadside, bills, renewals, driving scores, deductibles, vet bills, trip cover - through the same AOM RAG apps, Context Cache, LLM Cache and Agent Memory path the phone uses. Then watch AOM's <b>LLM Cache</b> and <b>Context Cache</b> pages.</p></div>
+          <p style="margin:0">Replay a real queue: policyholders from every region, health and pet members and on-demand customers ask Harborline what such people ask - ID cards, claim status, roadside, bills, renewals, driving scores, deductibles, vet bills, trip cover - through the same Couchbase Labs Agent Operations Manager RAG apps, Context Cache, LLM Cache and Agent Memory path the phone uses. Then watch Couchbase Labs Agent Operations Manager's <b>LLM Cache</b> and <b>Context Cache</b> pages.</p></div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <label style="font-size:13px">people/group <input id="wlUsers" type="number" min="1" max="1000" value="3" style="width:64px;font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px"></label>
           <label style="font-size:13px">concurrent <input id="wlConc" type="number" min="1" max="64" value="4" style="width:52px;font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px"></label>
@@ -322,7 +322,7 @@ table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:
           <button class="btn primary" id="wlRun">Run company workload</button>
           <button class="btn primary" id="wlRun24" title="300 people per group, 4 concurrent sessions, paced over 24 hours with a day/night traffic curve">Run for 24 hours</button>
           <button class="btn" id="wlStop" style="display:none">Stop</button>
-          <button class="btn" id="rsRun" title="Personas back to today's export: requests, chat, cached context, policies, claims, cover; AOM memories and Harborline's cache namespaces">Reset demo</button>
+          <button class="btn" id="rsRun" title="Personas back to today's export: requests, chat, cached context, policies, claims, cover; Couchbase Labs Agent Operations Manager memories and Harborline's cache namespaces">Reset demo</button>
         </div>
       </div>
       <p id="wlLine" style="margin:10px 0 0;font-size:14px;color:var(--muted)">Idle. <code>python scripts/run_chatbot_workload.py</code> does the same from a terminal, with a per-group report.</p>
@@ -330,7 +330,7 @@ table.cmp td small{display:block;color:var(--muted);font-size:12.5px;margin-top:
         <div class="stat"><div class="k">Turns</div><div class="v" id="wl_turns">-</div><div class="d" id="wl_turnsd">people · groups</div></div>
         <div class="stat"><div class="k">LLM cache</div><div class="v" id="wl_llm">-</div><div class="d" id="wl_llmd">exact + semantic hits</div></div>
         <div class="stat"><div class="k">Context cache</div><div class="v" id="wl_ctx">-</div><div class="d" id="wl_ctxd">follow-ups that reused context</div></div>
-        <div class="stat"><div class="k">Tokens saved</div><div class="v" id="wl_tok">-</div><div class="d" id="wl_tokd">as AOM counts them</div></div>
+        <div class="stat"><div class="k">Tokens saved</div><div class="v" id="wl_tok">-</div><div class="d" id="wl_tokd">as Couchbase Labs Agent Operations Manager counts them</div></div>
       </div>
     </div>
   </div>
@@ -361,7 +361,7 @@ $('#theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'
 let transformed=false;
 function transform(){transformed=!transformed; $('#sprawl').classList.toggle('gone',transformed); $('#cb').classList.toggle('gone',!transformed);
   $('#transform').textContent=transformed?'↺ Show the mixed product stack':'↻ Transform the stack';
-  $('#diagHint').textContent=transformed?'One set of JSON documents from the phone to the cloud: Couchbase Lite, Sync Gateway, Couchbase Server, and AOM for the AI.':'Grey dashed boxes are separate services to license, run and keep consistent. Red dashed is code your team writes and maintains.';}
+  $('#diagHint').textContent=transformed?'One set of JSON documents from the phone to the cloud: Couchbase Lite, Sync Gateway, Couchbase Server, and Couchbase Labs Agent Operations Manager for the AI.':'Grey dashed boxes are separate services to license, run and keep consistent. Red dashed is code your team writes and maintains.';}
 $('#transform').onclick=transform;
 // ---- cost simulation: per step [cb signal, cb body, plain signal, plain body]
 const COST_FULL=0.008, COST_PERSONAL=0.012, COST_FOLLOW=0.0024, COST_PLAIN_FOLLOW=0.016; // illustrative USD per answer
@@ -372,9 +372,9 @@ const S=[
    '●●● Wi-Fi', card('Insurance chat','How can I help?','Ready','ok')+tally(0,0,'')],
   ['●●● Wi-Fi', q("How do I file a claim?")+card('Open Claims, choose the policy, add photos and a short description, and submit - it works offline. An adjuster is assigned within one business day…','Customer RAG app · Help Center only','LLM cache · miss','warn')+tally(COST_FULL,1,'cached for everyone'),
    '●●● Wi-Fi', q("How do I file a claim?")+card('You can file a claim in the app with photos and a description…','Full prompt generated','Model call','bad')+tally(COST_FULL,1,'')],
-  ['●●● Wi-Fi', q("Daniel: How do I file a claim?")+card('Open Claims, choose the policy, add photos and a short description, and submit - it works offline…','Same answer, served from AOM','LLM cache · exact hit','ok')+tally(COST_FULL,1,'0 tokens'),
+  ['●●● Wi-Fi', q("Daniel: How do I file a claim?")+card('Open Claims, choose the policy, add photos and a short description, and submit - it works offline…','Same answer, served from Couchbase Labs Agent Operations Manager','LLM cache · exact hit','ok')+tally(COST_FULL,1,'0 tokens'),
    '●●● Wi-Fi', q("Daniel: How do I file a claim?")+card('You can file a claim in the app…','Generated again','Model call','bad')+tally(COST_FULL*2,2,'')],
-  ['●●● Wi-Fi', q("What's the status of my claim?")+card('Claim CLM-551207 has an estimate ready: $2,340 at Keystone Collision Center. Priya Raman is your adjuster.','Your policy record + profile + live claim','Context cache · built','ocean')+tally(COST_FULL+COST_PERSONAL,2,'context stored in AOM + Couchbase'),
+  ['●●● Wi-Fi', q("What's the status of my claim?")+card('Claim CLM-551207 has an estimate ready: $2,340 at Keystone Collision Center. Priya Raman is your adjuster.','Your policy record + profile + live claim','Context cache · built','ocean')+tally(COST_FULL+COST_PERSONAL,2,'context stored in Couchbase Labs Agent Operations Manager + Couchbase'),
    '●●● Wi-Fi', q("What's the status of my claim?")+card('Your claim has an estimate ready.','Policy, claim and history re-sent','Model call · 5k tokens','bad')+tally(COST_FULL*2+COST_PERSONAL,3,'')],
   ['●●● Wi-Fi', q('How much will I get paid?')+card('$1,840: the $2,340 estimate less your $500 collision deductible. Choose a repair shop or a direct payment.','Cached context + memory of the last turn','Context cache · hit','ok')+btn('Track CLM-551207')+tally(COST_FULL+COST_PERSONAL+COST_FOLLOW,3,'short call'),
    '●●● Wi-Fi', q('How much will I get paid?')+card('The estimate less your deductible.','Full prompt + history again','Model call · 6k tokens','bad')+tally(COST_FULL*2+COST_PERSONAL+COST_PLAIN_FOLLOW,4,'')],
@@ -394,7 +394,7 @@ $('#simNext').onclick=simNext; $('#simReset').onclick=()=>{st=0;renderSim();}; r
 // ---- live data from the running demo
 async function poll(){try{const d=await fetch('/api/status',{cache:'no-store'}).then(r=>r.json()); const a=d.aom||{}, l=d.load||{}, m=d.metrics||{}, reg=(a.registration||{}).state;
   const ok=a.configured&&a.health&&a.health.status==='ok';
-  $('#health').textContent=ok?'AOM: connected'+(reg==='registered'?' · registered':''):(a.configured?'AOM: connecting…':'AOM: not configured');
+  $('#health').textContent=ok?'Couchbase Labs Agent Operations Manager: connected'+(reg==='registered'?' · registered':''):(a.configured?'Couchbase Labs Agent Operations Manager: connecting…':'Couchbase Labs Agent Operations Manager: not configured');
   $('#health').className='pill '+(ok?'ok':(a.configured?'warn':'bad'));
   if(a.dashboard_url){$('#aomLink').href=a.dashboard_url;} else {$('#aomLink').style.display='none';}
   const turns=m.assistant_turns||0, llmCalls=m.llm_calls||0, llmHits=m.llm_hits||0, ctxHits=m.context_hits||0;
@@ -403,13 +403,13 @@ async function poll(){try{const d=await fetch('/api/status',{cache:'no-store'}).
   $('#a_gate').textContent=(m.restricted_turns||0)+' refused by the members gate (no health or pet plan)';
   const avoided=llmHits+ctxHits+onDevice;
   $('#m_turns').textContent=turns.toLocaleString(); $('#m_turnsd').textContent='since '+(m.since||'').slice(0,16).replace('T',' ')+' UTC · export '+(d.export_date||'…');
-  $('#m_llm').textContent=m.llm_hit_rate!=null?Math.round(m.llm_hit_rate)+'%':'-'; $('#m_llmd').textContent=llmHits+' of '+llmCalls+' model calls answered from AOM\'s LLM Cache';
+  $('#m_llm').textContent=m.llm_hit_rate!=null?Math.round(m.llm_hit_rate)+'%':'-'; $('#m_llmd').textContent=llmHits+' of '+llmCalls+' model calls answered from Couchbase Labs Agent Operations Manager\'s LLM Cache';
   $('#m_ctx').textContent=m.context_hit_rate!=null?Math.round(m.context_hit_rate)+'%':'-'; $('#m_ctxd').textContent=ctxHits+' of '+((m.context_hits||0)+(m.context_misses||0))+' personal questions reused cached context';
   $('#m_saved').textContent=avoided.toLocaleString()+(avoided?' ≈ $'+(avoided*0.008).toFixed(2):''); $('#m_savedd').textContent='full model calls avoided: cache hits plus answers served on the phone';
   const apps=Object.values(a.rag_apps||{}); const live=apps.filter(x=>['registered','updated'].includes(x.state)).length;
   const ragTxt=apps.length?(live+' of '+apps.length+' RAG apps registered'):'RAG apps not registered';
   const by=l.by_audience||{};
-  $('#liveLine').textContent=`${l.state==='loaded'?'Loaded':'Loading'} export ${d.export_date||'…'}${l.rows?' ('+(by.policyholder||0).toLocaleString()+' policyholders, '+(by.member||0).toLocaleString()+' members, '+(by.ondemand||0).toLocaleString()+' on-demand customers)':''} · ${(m.requests||0)} actions processed${a.configured?' through AOM':''} · ${ragTxt}.`;
+  $('#liveLine').textContent=`${l.state==='loaded'?'Loaded':'Loading'} export ${d.export_date||'…'}${l.rows?' ('+(by.policyholder||0).toLocaleString()+' policyholders, '+(by.member||0).toLocaleString()+' members, '+(by.ondemand||0).toLocaleString()+' on-demand customers)':''} · ${(m.requests||0)} actions processed${a.configured?' through Couchbase Labs Agent Operations Manager':''} · ${ragTxt}.`;
 }catch(e){$('#health').textContent='Demo backend: offline'; $('#health').className='pill bad'; $('#liveLine').textContent="The demo backend isn't answering yet.";}}
 // ---- company-wide chatbot workload (POST /api/demo/workload)
 const pct=v=>v==null?'-':Math.round(v)+'%';
@@ -422,7 +422,7 @@ function renderWl(w){ if(!w||!w.state||w.state==='idle'){return;}
   $('#wl_tok').textContent=(t.tokens_saved||0).toLocaleString(); $('#wl_tokd').textContent='≈ $'+(t.cost_saved_usd||0).toFixed(4)+' at list price'+(t.errors?' · '+t.errors+' errors':'');
   $('#wlRun24').disabled=running;
   const dh=(w.params||{}).duration_hours;
-  $('#wlLine').textContent=running?('Running - '+(w.done_turns||0)+' of '+w.total_turns+' turns…'+(dh?' paced over '+dh+' h (day/night curve), ends '+new Date(w.ends_at).toLocaleString()+'; '+(w.elapsed_hours||0)+' h elapsed':'')):('Run '+w.run_id+' '+w.state+' in '+w.seconds+'s. Open AOM → LLM Cache and Context Cache to see it.');}
+  $('#wlLine').textContent=running?('Running - '+(w.done_turns||0)+' of '+w.total_turns+' turns…'+(dh?' paced over '+dh+' h (day/night curve), ends '+new Date(w.ends_at).toLocaleString()+'; '+(w.elapsed_hours||0)+' h elapsed':'')):('Run '+w.run_id+' '+w.state+' in '+w.seconds+'s. Open Couchbase Labs Agent Operations Manager → LLM Cache and Context Cache to see it.');}
 async function pollWl(){try{const w=await fetch('/api/demo/workload',{cache:'no-store'}).then(r=>r.json()); renderWl(w); if(w.state==='running'){setTimeout(pollWl,(w.params||{}).duration_hours?10000:1500);}}catch(e){}}
 $('#wlRun').onclick=async()=>{ $('#wlRun').disabled=true; $('#wlLine').textContent='Starting…';
   const g=+$('#wlUsers').value||3, c=+$('#wlConc').value||4;
@@ -437,13 +437,13 @@ $('#wlRun24').onclick=async()=>{ if(!confirm('Run the company workload for 24 ho
 $('#wlStop').onclick=async()=>{await fetch('/api/demo/workload',{method:'DELETE'}); pollWl();};
 function wlEstimate(){const g=+$('#wlUsers').value||0, c=+$('#wlConc').value||1; const turns=g*9*6; const secs=Math.round(turns*1.2/c); $('#wlEst').textContent=g?`≈ ${turns.toLocaleString()} turns · ~${secs<120?secs+' s':Math.round(secs/60)+' min'}`:'';}
 $('#wlUsers').oninput=wlEstimate; $('#wlConc').oninput=wlEstimate; wlEstimate();
-$('#rsRun').onclick=async()=>{ if(!confirm('Reset the demo? Personas go back to today\'s export, their AOM memories are deleted and Harborline\'s AOM cache namespaces are purged.')) return;
+$('#rsRun').onclick=async()=>{ if(!confirm('Reset the demo? Personas go back to today\'s export, their Couchbase Labs Agent Operations Manager memories are deleted and Harborline\'s Couchbase Labs Agent Operations Manager cache namespaces are purged.')) return;
   $('#rsRun').disabled=true; $('#wlLine').textContent='Resetting…';
   const r=await fetch('/api/demo/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
   const d=await r.json().catch(()=>({})); $('#rsRun').disabled=false;
   if(!r.ok){$('#wlLine').textContent='Reset failed: '+(d.detail||r.status); return;}
   const s=d.summary||{}; $('#wlStats').style.display='none';
-  $('#wlLine').textContent='Reset done: '+s.users+' people back to export '+d.export_date+', '+s.requests_removed+' requests removed, '+s.memories_deleted+' AOM memories deleted. Reload the app.'; poll();};
+  $('#wlLine').textContent='Reset done: '+s.users+' people back to export '+d.export_date+', '+s.requests_removed+' requests removed, '+s.memories_deleted+' Couchbase Labs Agent Operations Manager memories deleted. Reload the app.'; poll();};
 pollWl();
 poll(); setInterval(poll,10000);
 </script>

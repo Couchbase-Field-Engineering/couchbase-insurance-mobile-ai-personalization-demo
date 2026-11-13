@@ -16,9 +16,9 @@ const METHODS = ['card on file', 'bank account'];
  * Use case 4 - premium payments and renewals.
  *
  * What is due, AutoPay and the renewal offer are all in the profile document
- * on the phone. Each action is a request the Billing Agent runs through AOM:
+ * on the phone. Each action is a request the Billing Agent runs through Couchbase Labs Agent Operations Manager:
  * a payment, an AutoPay change, accepting a renewal. A late-fee waiver is a
- * goodwill gesture, so AOM holds it for a billing supervisor's approval and
+ * goodwill gesture, so Couchbase Labs Agent Operations Manager holds it for a billing supervisor's approval and
  * the phone shows "Awaiting approval" until the decision syncs back.
  *
  * Reminders: the For You feed raises a payment card inside the grace window
@@ -143,7 +143,7 @@ export default function Pay() {
             <>
               <SectionTitle title="Ask for the late fee to be waived" />
               <Card style={{ padding: 14, gap: 10 }}>
-                <Text style={form.meta}>A waiver is a goodwill gesture (once a year, up to $50). The Billing Agent prepares it and a billing supervisor approves it in Couchbase AOM.</Text>
+                <Text style={form.meta}>A waiver is a goodwill gesture (once a year, up to $50). The Billing Agent prepares it and a billing supervisor approves it in Couchbase Labs Agent Operations Manager.</Text>
                 <TextInput value={reason} onChangeText={setReason} placeholder="What happened? e.g. my card was replaced after fraud" placeholderTextColor={theme.color.faint} style={form.input} />
                 <Button kind="ghost" label={`Request a ${money(b.late_fee_usd)} waiver`} icon="gift" disabled={reason.trim().length < 8} onPress={() => void go('request_fee_waiver', { reason: reason.trim() }, `Late-fee waiver · ${pol.policy_id}`)} />
               </Card>

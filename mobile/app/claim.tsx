@@ -28,7 +28,7 @@ const NEXT: Record<string, string> = {
  * Filing: photos and video are captured at the scene, where there is often
  * no signal. The claim is saved as a `requests` document in Couchbase Lite
  * and pushed when the phone reconnects; the worker hands it to the Claims
- * Agent, which recalls this customer's claim history from AOM Agent Memory
+ * Agent, which recalls this customer's claim history from Couchbase Labs Agent Operations Manager Agent Memory
  * and files it as a governed tool call.
  *
  * Tracking: the claim lives in the profile document, so every status change

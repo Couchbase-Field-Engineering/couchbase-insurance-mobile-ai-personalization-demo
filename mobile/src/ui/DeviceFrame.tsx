@@ -81,12 +81,12 @@ function StatusBarOverlay({ dark, offline, background }: { dark: boolean; offlin
 function SidePanel() {
   const [reset, setReset] = useState<{ busy: boolean; line: string }>({ busy: false, line: '' });
   const resetDemo = async () => {
-    if (!window.confirm("Reset the demo? Maya, Daniel and Sofia go back to today's export (requests, policies, claims, bills, trips, cover, chat, cached context), their AOM memories are deleted and the app's AOM caches are purged.")) return;
+    if (!window.confirm("Reset the demo? Maya, Daniel and Sofia go back to today's export (requests, policies, claims, bills, trips, cover, chat, cached context), their Couchbase Labs Agent Operations Manager memories are deleted and the app's Couchbase Labs Agent Operations Manager caches are purged.")) return;
     setReset({ busy: true, line: 'Resetting…' });
     try {
       const r = await api<{ summary: { users: number; requests_removed: number; memories_deleted: number }; export_date: string }>(
         '/api/demo/reset', { method: 'POST', body: {}, timeoutMs: 120000 });
-      setReset({ busy: false, line: `Reset done: ${r.summary.users} people back to export ${r.export_date}, ${r.summary.requests_removed} requests removed, ${r.summary.memories_deleted} AOM memories deleted. Reloading…` });
+      setReset({ busy: false, line: `Reset done: ${r.summary.users} people back to export ${r.export_date}, ${r.summary.requests_removed} requests removed, ${r.summary.memories_deleted} Couchbase Labs Agent Operations Manager memories deleted. Reloading…` });
       setTimeout(() => window.location.assign('/login'), 1200);
     } catch (e) {
       setReset({ busy: false, line: `Reset failed: ${(e as Error).message}` });
@@ -99,7 +99,7 @@ function SidePanel() {
       <Text style={styles.panelTitle}>One insurance app, seven governed agents</Text>
       <Text style={styles.panelBody}>
         ID cards, claims, roadside, payments, telematics, support, wellness and on-demand cover in one app. Every screen renders from the
-        on-device database, and every answer and action is governed by the Couchbase Agent Operations Manager.
+        on-device database, and every answer and action is governed by the Couchbase Labs Agent Operations Manager.
       </Text>
       {[
         ['phone-portrait-outline', 'Couchbase Lite', 'Offline-first: ID cards open with no signal; claims, roadside calls, payments and trips queue on the phone and sync when it reconnects'],
