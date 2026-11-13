@@ -22,8 +22,6 @@ It is built on the [OneChat demo](https://github.com/Couchbase-Field-Engineering
 * Every action is an RBAC-checked, traced and audited AOM **tool call**, run by the agent that owns that use case. Each specialist is limited to its own tools (the Billing Agent cannot file a claim) and uses **Agent Memory** to recall and record what happened.
 * Late-fee waivers wait for a billing supervisor and coverage changes for an underwriter in AOM's **approval tier**.
 
-The app is Expo / React Native with Couchbase Lite via `cbl-reactnative`, plus a browser preview engine that syncs the same documents over REST. The look follows couchbase.com: black, white and Couchbase red.
-
 ---
 
 ## What the demo shows
